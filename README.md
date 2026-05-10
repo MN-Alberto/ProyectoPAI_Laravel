@@ -1,249 +1,59 @@
-# ProyectoPAI – Personal Artificial Intelligence
+<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-## Descripción del proyecto
+<p align="center">
+<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+</p>
 
-**PAI** es una aplicación web tipo ChatGPT desarrollada como sistema de chat inteligente multiusuario. Permite a los usuarios autenticados mantener conversaciones persistentes con una inteligencia artificial local, generando respuestas en tiempo real mediante streaming.
+## About Laravel
 
-El sistema funciona completamente en local y offline, ejecutando tanto el backend como el modelo de inteligencia artificial directamente en el ordenador del usuario mediante Docker.
+Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-El objetivo del proyecto es simular un sistema SaaS moderno de chat con IA, incluyendo gestión de usuarios, historial de conversaciones, streaming de respuestas y ejecución de un modelo de lenguaje local sin dependencias externas ni servicios cloud.
+- [Simple, fast routing engine](https://laravel.com/docs/routing).
+- [Powerful dependency injection container](https://laravel.com/docs/container).
+- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
+- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
+- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
+- [Robust background job processing](https://laravel.com/docs/queues).
+- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
 
----
+Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Objetivos principales
+## Learning Laravel
 
-- Implementar un sistema de chat tipo ChatGPT
-- Soportar múltiples usuarios con autenticación
-- Gestionar conversaciones persistentes
-- Integrar un modelo de IA local
-- Implementar respuestas en streaming (tiempo real)
-- Ejecutar todo el sistema completamente offline
-- Ejecutar todo el sistema en entorno portable mediante Docker
+Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
 
----
+If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
 
-## Arquitectura del sistema
+## Laravel Sponsors
 
-Frontend (Blade / JavaScript)
-        ->
-Backend (Laravel API)
-        ->
-Servicios internos (Chat + IA)
-        ->
-Modelo de IA local (Ollama + Mistral)
-        ->
-Base de datos (MySQL)
+We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
 
----
+### Premium Partners
 
-## Tecnologías utilizadas
+- **[Vehikl](https://vehikl.com)**
+- **[Tighten Co.](https://tighten.co)**
+- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
+- **[64 Robots](https://64robots.com)**
+- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
+- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
+- **[Redberry](https://redberry.international/laravel-development)**
+- **[Active Logic](https://activelogic.com)**
 
-### Backend
-- Laravel (PHP Framework)
-- Eloquent ORM
-- Laravel Breeze (autenticación)
-- Laravel Policies (control de acceso)
+## Contributing
 
-### Frontend
-- Blade Templates
-- JavaScript (fetch + streaming SSE)
-- UI tipo chat en tiempo real
+Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
-### Base de datos
-- MySQL
+## Code of Conduct
 
-### Inteligencia Artificial
-- Ollama (motor de inferencia local)
-- Modelo LLM local: Mistral
-- Inferencia completamente offline
+In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
 
-### Infraestructura
-- Docker Desktop
-- Docker Compose
-- Contenedores para:
-  - Laravel App
-  - MySQL
-  - Ollama
+## Security Vulnerabilities
 
----
+If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## Funcionamiento offline
+## License
 
-El sistema está diseñado para funcionar completamente sin conexión a internet.
-
-Todas las operaciones se ejecutan localmente:
-
-- Backend Laravel local
-- Base de datos MySQL local
-- Modelo de IA almacenado localmente
-- Generación de respuestas sin APIs externas
-- Comunicación interna mediante Docker Network
-
-El modelo de IA se ejecuta mediante Ollama utilizando un volumen persistente Docker para evitar pérdida del modelo entre reinicios o apagados del sistema.
-
----
-
-## Inteligencia artificial
-
-El sistema utiliza **Ollama** como motor local, ejecutando el modelo **Mistral** dentro de un contenedor Docker.
-
-Esto permite:
-
-- Ejecución totalmente offline
-- Privacidad completa de los datos
-- Sin dependencias cloud
-- Sin consumo de APIs externas
-- Respuestas privadas y locales
-- Streaming de tokens en tiempo real
-- Baja latencia en entorno local
-
-Laravel se comunica directamente con Ollama mediante HTTP interno:
-
-```php
-Http::post('http://ollama:11434/api/generate')
-```
-
----
-
-## Funcionalidades principales
-
-- Registro e inicio de sesión de usuarios
-- Sistema de conversaciones persistentes
-- Chat con IA tipo ChatGPT
-- Streaming de respuestas en tiempo real
-- Historial completo de mensajes
-- Regeneración de respuestas
-- Cancelación de generación de respuesta
-- Gestión de múltiples conversaciones por usuario
-- Ejecución completamente offline
-
----
-
-## Ejecución con Docker
-
-El proyecto está preparado para ejecutarse completamente mediante Docker Desktop en Windows.
-
-### 1. Construir y levantar contenedores
-
-```bash
-docker compose up --build
-```
-
-### 2. Acceder a la aplicación
-
-La aplicación se ejecuta localmente en:
-
-```txt
-http://localhost:8000
-```
-
----
-
-## Servicios incluidos
-
-| Servicio    | Descripción                              |
-| ------------ | ---------------------------------------- |
-| Laravel App | Backend principal del sistema            |
-| MySQL       | Base de datos local                      |
-| Ollama      | Motor de IA local offline                |
-
----
-
-## Persistencia del modelo de IA
-
-El modelo Mistral se almacena en un volumen Docker persistente:
-
-```yaml
-volumes:
-  - ollama_data:/root/.ollama
-```
-
-Esto permite:
-
-- Mantener el modelo aunque el contenedor se elimine
-- Portabilidad entre ordenadores
-- Persistencia tras reinicios
-- Ejecución offline estable
-
----
-
-## Flujo de generación de respuesta
-
-1. El usuario envía un mensaje
-2. Laravel guarda el mensaje en MySQL
-3. Se construye el contexto de conversación
-4. Laravel envía el prompt a Ollama
-5. Ollama genera la respuesta token a token
-6. El frontend recibe el stream en tiempo real
-7. La respuesta se almacena en la base de datos
-
----
-
-## Seguridad
-
-- Autenticación mediante Laravel Breeze
-- Middleware de autenticación obligatorio
-- Aislamiento de conversaciones por usuario
-- Policies para control de acceso
-- Sin envío de datos a servidores externos
-- Ejecución completamente local
-
----
-
-## Requisitos del sistema
-
-### Requisitos mínimos
-
-- Windows 10/11
-- Docker Desktop
-- 8GB RAM recomendados
-- Espacio libre suficiente para modelos LLM
-
-### Requisitos opcionales
-
-- PHP 8.2+
-- Composer
-- Node.js
-
----
-
-## Portabilidad del sistema
-
-El sistema puede transportarse fácilmente entre ordenadores mediante:
-
-- Repositorio Git
-- Docker Compose
-- Volumen persistente de Ollama
-- Exportación/importación del modelo local
-
-Esto permite continuar el desarrollo o realizar presentaciones sin necesidad de reinstalar modelos.
-
----
-
-## Casos de uso
-
-- Asistente virtual local
-- Chat privado sin conexión
-- Sistema educativo de IA
-- Prototipo SaaS de IA
-- Laboratorio local de LLMs
-- Aplicación IA portable
-
----
-
-## Posibles mejoras futuras
-
-- Memoria a largo plazo
-- Sistema de roles (admin/user)
-- Streaming mediante WebSockets
-- Interfaz avanzada React/Vue
-- Soporte multi-modelo
-- Integración RAG local
-- Base vectorial local
-- GPU acceleration
-
----
-
-## Autor
-
-Alberto Méndez Núñez - DAW2
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
