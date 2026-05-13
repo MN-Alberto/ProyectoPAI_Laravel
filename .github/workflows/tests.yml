@@ -43,13 +43,20 @@ jobs:
       - name: Generate app key
         run: php artisan key:generate
 
-      - name: Prepare Laravel storage directories
+      - name: Prepare Laravel runtime
         run: |
           mkdir -p storage/framework/cache
           mkdir -p storage/framework/sessions
           mkdir -p storage/framework/views
           mkdir -p storage/framework/testing
           mkdir -p bootstrap/cache
+          chmod -R 777 storage bootstrap/cache
+      
+      - name: Clear Laravel cache
+        run: |
+          php artisan config:clear
+          php artisan cache:clear
+          php artisan view:clear
 
       - name: Execute tests
         run: php artisan test
