@@ -43,5 +43,13 @@ jobs:
       - name: Generate app key
         run: php artisan key:generate
 
+      - name: Prepare Laravel storage directories
+        run: |
+          mkdir -p storage/framework/cache
+          mkdir -p storage/framework/sessions
+          mkdir -p storage/framework/views
+          mkdir -p storage/framework/testing
+          mkdir -p bootstrap/cache
+
       - name: Execute tests
         run: php artisan test
