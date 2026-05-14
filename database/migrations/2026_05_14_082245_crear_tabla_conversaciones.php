@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Migrations\Migration; // nos permite crear migraciones
+use Illuminate\Database\Schema\Blueprint; // nos permite crear tablas
+use Illuminate\Support\Facades\Schema; // nos permite crear tablas
 
 return new class extends Migration {
     /**
