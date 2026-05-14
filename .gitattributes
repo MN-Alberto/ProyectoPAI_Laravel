@@ -1,4 +1,20 @@
+# Forzamos LF en todos los archivos de texto
 * text=auto eol=lf
+
+*.sh text eol=lf
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.blade.php text eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
 
 *.blade.php diff=html
 *.css diff=css
