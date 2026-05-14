@@ -37,5 +37,5 @@ RUN chmod -R 775 storage bootstrap/cache \
 EXPOSE 8000
 
 # Archivo del entrypoint
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]
 CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
