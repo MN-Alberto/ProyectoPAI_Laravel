@@ -1,0 +1,51 @@
+services:
+
+  app:
+    image: pai-app:latest          # imagen preconstruida desde el USB
+    container_name: pai_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: pai
+      DB_USERNAME: usuario_pai
+      DB_PASSWORD: CD97ertvct$E
+      OLLAMA_HOST: "http://ollama:11434"
+
+  mysql:
+    image: mysql:8.0               # imagen precargada desde el USB
+    container_name: pai_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pai
+      MYSQL_USER: usuario_pai
+      MYSQL_PASSWORD: CD97ertvct$E
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+
+  ollama:
+    image: ollama/ollama:latest    # imagen precargada desde el USB
+    container_name: pai_ollama
+    restart: unless-stopped
+    volumes:
+      - ./ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+
+volumes:
+  mysql_data:
