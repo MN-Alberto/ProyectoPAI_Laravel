@@ -52,6 +52,7 @@ bootstrap/cache/*
 *.tar
 *.tar.gz
 *.7z
+ollama_data/
 
 ############################
 # IDEs
