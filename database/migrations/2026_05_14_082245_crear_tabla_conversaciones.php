@@ -13,7 +13,7 @@ return new class extends Migration {
         // Creamos la tabla conversaciones con los campos id, idUsuario, tituloConversacion y timestamps
         Schema::create('conversaciones', function (Blueprint $table) {
             $table->id(); // id autogenerado
-            $table->foreignId('idUsuario')->constrained()->cascadeOnDelete(); // id del usuario que crea la conversación
+            $table->foreignId('idUsuario')->constrained('users')->cascadeOnDelete(); // id del usuario que crea la conversación
             $table->string('tituloConversacion')->default('Nueva conversación'); // titulo de la conversación, por defecto será "Nueva conversación"
             $table->timestamps(); // fecha de creación y actualización para la conversación
         });
