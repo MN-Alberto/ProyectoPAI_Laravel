@@ -30,7 +30,8 @@ RUN composer install --no-interaction --optimize-autoloader
 RUN npm ci && npm run build
 
 # Permisos de Laravel
-RUN chmod -R 775 storage bootstrap/cache \
+RUN mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions \
+    && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
 # Abrimos el puerto 8000 para acceder en local

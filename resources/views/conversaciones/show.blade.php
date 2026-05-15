@@ -10,7 +10,7 @@
 
     <div id="mensajes">
         @foreach ($mensajes as $mensaje)
-            <p><strong>{{ $mensaje->role }}:</strong> {{ $mensaje->content }}</p>
+            <p><strong>{{ $mensaje->rol }}:</strong> {{ $mensaje->contenido }}</p>
         @endforeach
     </div>
 

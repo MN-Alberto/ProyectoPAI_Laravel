@@ -13,19 +13,19 @@ use App\Models\Conversacion; // manejamos las conversaciones
 //     {
 //         Gate::authorize('view', $conversacion); // verificamos si el usuario tiene permiso para ver la conversación
 
-//         $request->validate(['contenido' => 'required|string|max:10000']); // validamos que el mensaje no esté vacío y no tenga mas de 10000 caracteres
+//         $request->validate(['content' => 'required|string|max:10000']); // validamos que el mensaje no esté vacío y no tenga mas de 10000 caracteres
 
-//         // Creamos el mensaje del usuario con el rol y en contenido
+//         // Creamos el mensaje del usuario con el rol y en content
 //         $conversacion->mensajes()->create([
 //             'rol' => 'usuario',
-//             'contenido' => $request->contenido
+//             'contenido' => $request->content
 //         ]);
 
 //         // si es el primer mensaje, actualizamos el titulo de la conversación
 //         if ($conversacion->mensajes()->count() === 1) {
 //             // cortamos el primer mensaje a los primeros 60 caracteres
 //             $conversacion->update([
-//                 'titulo' => mb_substr($request->contenido, 0, 60)
+//                 'tituloConversacion' => mb_substr($request->content, 0, 60)
 //             ]);
 //         }
 
@@ -35,10 +35,10 @@ use App\Models\Conversacion; // manejamos las conversaciones
 //         // Generamos el prompt para la IA con el contexto de la conversación
 //         $prompt = $this->generarPrompt($mensajes);
 
-//         // Creamos el mensaje de la IA en la conversación con contenido vacío
+//         // Creamos el mensaje de la IA en la conversación con content vacío
 //         $mensajeRespuesta = $conversacion->mensajes()->create([
-//             'rol' => 'asistente',
-//             'contenido' => ''
+//             'rol' => 'ia',
+//             'content' => ''
 //         ]);
 
 //         // Generamos la respuesta de la IA en streaming
@@ -117,7 +117,7 @@ use App\Models\Conversacion; // manejamos las conversaciones
 
 //                 fclose($stream); // cerramos la conexion con la API de Ollama
 
-//                 $mensajeRespuesta->update(['contenido' => $respuestaCompleta]); // actualizamos el mensaje de la IA con la respuesta completa
+//                 $mensajeRespuesta->update(['content' => $respuestaCompleta]); // actualizamos el mensaje de la IA con la respuesta completa
 
 //                 echo "data: [DONE]\n\n"; // enviamos el token en formato JSON al usuario
 
@@ -129,7 +129,7 @@ use App\Models\Conversacion; // manejamos las conversaciones
 //             [
 //                 // Control de cache: desactiva el almacenamiento en cache
 //                 'Cache-Control' => 'no-cache',
-//                 // Tipo de contenido: es una secuencia de eventos (Server-Sent Events)
+//                 // Tipo de content: es una secuencia de eventos (Server-Sent Events)
 //                 'Content-Type' => 'text/event-stream',
 //                 // Desactiva el buffering en servidores nginx
 //                 'X-Accel-Buffering' => 'no',
@@ -149,13 +149,13 @@ use App\Models\Conversacion; // manejamos las conversaciones
 //             // Si el mensaje es del usuario
 //             if ($mensaje->rol === 'usuario') {
 //                 // Agregamos el mensaje del usuario al prompt en formato [INST]
-//                 $prompt .= "[INST] {$mensaje->contenido} [/INST]";
+//                 $prompt .= "[INST] {$mensaje->content} [/INST]";
 //                 // Agregamos el tag de fin de mensaje del usuario
 //                 $prompt .= " </s>";
 
-//             } elseif ($mensaje->rol === 'asistente' && !empty($mensaje->contenido)) {
+//             } elseif ($mensaje->rol === 'ia' && !empty($mensaje->content)) {
 //                 // Agregamos el mensaje de la IA al prompt en formato </s><s>
-//                 $prompt .= " {$mensaje->contenido} </s><s>";
+//                 $prompt .= " {$mensaje->content} </s><s>";
 //             }
 //         }
 //         return $prompt;
@@ -168,22 +168,19 @@ class MensajeController extends Controller
     {
         Gate::authorize('view', $conversacion);
 
-        $request->validate(['contenido' => 'required|string|max:10000']);
+        $request->validate(['content' => 'required|string|max:10000']);
 
-        // Guardar mensaje del usuario
         $conversacion->mensajes()->create([
             'rol' => 'usuario',
-            'contenido' => $request->contenido,
+            'contenido' => $request->content,
         ]);
 
-        // Actualizar título en el primer mensaje
         if ($conversacion->mensajes()->count() === 1) {
             $conversacion->update([
-                'title' => mb_substr($request->contenido, 0, 60),
+                'tituloConversacion' => mb_substr($request->content, 0, 60),
             ]);
         }
 
-        // Construir prompt con todo el historial
         $mensajes = $conversacion->mensajes()->orderBy('created_at')->get();
         $prompt = $this->generarPrompt($mensajes);
 
@@ -211,9 +208,8 @@ class MensajeController extends Controller
         $data = json_decode($respuesta, true);
         $contenido = $data['response'] ?? 'Sin respuesta.';
 
-        // Guardar respuesta en BD
         $conversacion->mensajes()->create([
-            'rol' => 'asistente',
+            'rol' => 'ia',
             'contenido' => $contenido,
         ]);
 
@@ -222,11 +218,12 @@ class MensajeController extends Controller
 
     private function generarPrompt($mensajes): string
     {
-        $prompt = "<s>";
+        $prompt = "<s>[INST] Eres un asistente útil. Responde siempre en el mismo idioma que el usuario. No traduzcas ni pongas texto entre paréntesis en otro idioma. [/INST] Entendido, responderé siempre en el idioma del usuario.</s><s>";
+
         foreach ($mensajes as $mensaje) {
             if ($mensaje->rol === 'usuario') {
                 $prompt .= "[INST] {$mensaje->contenido} [/INST]";
-            } elseif ($mensaje->rol === 'asistente' && !empty($mensaje->contenido)) {
+            } elseif ($mensaje->rol === 'ia' && !empty($mensaje->contenido)) {
                 $prompt .= " {$mensaje->contenido}</s><s>";
             }
         }
