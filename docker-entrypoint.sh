@@ -19,7 +19,7 @@ TRIES=0
 
 until php -r "
     try{
-        new PDO('mysql:host=mysql;port=3306;dbname=pai', 'pai_user', 'secret');
+        new PDO('mysql:host=mysql;port=3306;dbname=pai', 'usuario_pai', 'paso1234');
         exit(0);
     }
 	catch (Exception \$e){
