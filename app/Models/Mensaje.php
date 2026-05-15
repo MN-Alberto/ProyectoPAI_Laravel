@@ -13,6 +13,6 @@ class Mensaje extends Model
     // Definimos la relacion entre mensaje y conversacion
     public function conversacion(): BelongsTo
     {
-        return $this->belongsTo(Conversacion::class);
+        return $this->belongsTo(Conversacion::class, 'idConversacion');
     }
 }

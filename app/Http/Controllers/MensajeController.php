@@ -179,7 +179,7 @@ class MensajeController extends Controller
         // Actualizar título en el primer mensaje
         if ($conversacion->mensajes()->count() === 1) {
             $conversacion->update([
-                'title' => mb_substr($request->contenido, 0, 60),
+                'tituloConversacion' => mb_substr($request->contenido, 0, 60),
             ]);
         }
 

@@ -21,6 +21,6 @@ class Conversacion extends Model
     // Definimos la relacion entre conversacion y mensajes
     public function mensajes(): HasMany
     {
-        return $this->hasMany(Mensaje::class);
+        return $this->hasMany(Mensaje::class, 'idConversacion');
     }
 }
