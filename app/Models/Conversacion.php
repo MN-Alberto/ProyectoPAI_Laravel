@@ -15,7 +15,7 @@ class Conversacion extends Model
     // Definimos la relacion entre conversacion y usuario
     public function usuario(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'idUsuario');
     }
 
     // Definimos la relacion entre conversacion y mensajes

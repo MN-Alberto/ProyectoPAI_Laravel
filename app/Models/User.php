@@ -50,6 +50,6 @@ class User extends Authenticatable
     // Definimos la relacion entre usuario y conversacion
     public function conversaciones(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Conversacion::class);
+        return $this->hasMany(Conversacion::class, 'idUsuario');
     }
 }
