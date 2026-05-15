@@ -15,7 +15,7 @@ class ConversacionController extends Controller
         // Si el usuario no tiene conversaciones, crea una nueva llamada "Nuevo chat" y redirige a ella
         if ($conversaciones->isEmpty()) {
             $conversacion = auth()->user()->conversaciones()->create([
-                'titulo' => 'Nuevo chat',
+                'tituloConversacion' => 'Nuevo chat',
             ]);
             // redirige a la conversación nueva
             return redirect()->route('conversaciones.show', $conversacion->id);
@@ -30,7 +30,7 @@ class ConversacionController extends Controller
     {
         // Crear una nueva conversación llamada "Nuevo chat"
         $conversacion = auth()->user()->conversaciones()->create([
-            'titulo' => 'Nuevo chat',
+            'tituloConversacion' => 'Nuevo chat',
         ]);
 
         // redirige a la conversación nueva

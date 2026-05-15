@@ -10,7 +10,7 @@ class Conversacion extends Model
 {
     protected $table = 'conversaciones'; // le indicamos a laravel que la tabla es conversaciones, sino no la encuenta, busca conversacions
 
-    protected $fillable = ['idUsuario', 'titulo']; // campos que laravel puede rellenar automaticamente al crear una conversacion
+    protected $fillable = ['idUsuario', 'tituloConversacion']; // campos que laravel puede rellenar automaticamente al crear una conversacion
 
     // Definimos la relacion entre conversacion y usuario
     public function usuario(): BelongsTo

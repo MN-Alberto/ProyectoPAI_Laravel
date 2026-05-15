@@ -25,7 +25,7 @@ use App\Models\Conversacion; // manejamos las conversaciones
 //         if ($conversacion->mensajes()->count() === 1) {
 //             // cortamos el primer mensaje a los primeros 60 caracteres
 //             $conversacion->update([
-//                 'titulo' => mb_substr($request->contenido, 0, 60)
+//                 'tituloConversacion' => mb_substr($request->contenido, 0, 60)
 //             ]);
 //         }
 
