@@ -218,11 +218,17 @@ class MensajeController extends Controller
 
     private function generarPrompt($mensajes): string
     {
-        $prompt = "<s>[INST] Eres un asistente útil. Responde siempre en el mismo idioma que el usuario. No traduzcas ni pongas texto entre paréntesis en otro idioma. [/INST] Entendido, responderé siempre en el idioma del usuario.</s><s>";
+        $prompt = "<s>[INST] <<SYS>>\nYou are a helpful assistant. Always respond in the same language the user uses. If the user writes in Spanish, respond in Spanish only. If the user writes in English, respond in English only. Never mix languages or add translations in parentheses.\n<</SYS>>\n\n";
 
+        $primera = true;
         foreach ($mensajes as $mensaje) {
             if ($mensaje->rol === 'usuario') {
-                $prompt .= "[INST] {$mensaje->contenido} [/INST]";
+                if ($primera) {
+                    $prompt .= "{$mensaje->contenido} [/INST]";
+                    $primera = false;
+                } else {
+                    $prompt .= "[INST] {$mensaje->contenido} [/INST]";
+                }
             } elseif ($mensaje->rol === 'ia' && !empty($mensaje->contenido)) {
                 $prompt .= " {$mensaje->contenido}</s><s>";
             }
