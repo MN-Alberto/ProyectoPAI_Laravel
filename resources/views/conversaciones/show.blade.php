@@ -1,71 +1,89 @@
+<!-- 
+    Muestra la conversación actual
+-->
 @extends('layouts.chat')
-
+<!-- 
+    Contenido del área de mensajes
+-->
 @section('content')
 
-    <h1>PAI – Test de conectividad</h1>
-    <p>Usuario: {{ auth()->user()->name }}</p>
-    <p>Conversación: {{ $conversacion->id }}</p>
-
-    <hr>
-
-    <div id="mensajes">
-        @foreach ($mensajes as $mensaje)
-            <p><strong>{{ $mensaje->rol }}:</strong> {{ $mensaje->contenido }}</p>
-        @endforeach
-    </div>
-
-    <hr>
-
-    <textarea id="input" rows="3" cols="50" placeholder="Escribe tu mensaje..."></textarea>
-    <br>
-    <button id="btn-enviar" onclick="enviar()">Enviar</button>
-
-    <p id="estado"></p>
-
     <script>
-        const CONVERSACION_ID = {{ $conversacion->id }};
-        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
-
-        async function enviar() {
-            const input = document.getElementById('input');
-            const content = input.value.trim();
-            if (!content) return;
-
-            input.value = '';
-            input.disabled = true;
-            document.getElementById('btn-enviar').disabled = true;
-            document.getElementById('estado').innerText = 'Esperando respuesta de Ollama...';
-
-            document.getElementById('mensajes').innerHTML +=
-                `<p><strong>user:</strong> ${content}</p>`;
-
-            try {
-                const res = await fetch(`/conversaciones/${CONVERSACION_ID}/mensajes`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CSRF_TOKEN,
-                    },
-                    body: JSON.stringify({ content }),
-                });
-
-                const data = await res.json();
-
-                if (data.error) {
-                    document.getElementById('estado').innerText = 'ERROR: ' + data.error;
-                } else {
-                    document.getElementById('mensajes').innerHTML +=
-                        `<p><strong>assistant:</strong> ${data.response}</p>`;
-                    document.getElementById('estado').innerText = '';
-                }
-
-            } catch (err) {
-                document.getElementById('estado').innerText = 'Error de conexión: ' + err.message;
-            } finally {
-                input.disabled = false;
-                document.getElementById('btn-enviar').disabled = false;
-            }
-        }
+        // Variable que guarda el id de la conversación actual
+        window.ID_CONVERSACION = {{ $conversacion->id }};
+        // Variable que guarda el token csrf para enviar peticiones
+        window.TOKEN_CSRF = document.querySelector('meta[name="csrf-token"]').content;
+        // Variable que guarda el estado de si se esta enviando un mensaje
+        window.enviando = false;
     </script>
+
+    <div id="contenedor-mensajes">
+        <!--
+            Recorre todos los mensajes de la conversación
+            -->
+        @forelse ($mensajes as $mensaje)
+            <!--
+                    Si el mensaje es del usuario, se muestra como un mensaje de usuario y si no como un mensaje de ia
+                    -->
+            @if ($mensaje->rol === 'usuario')
+                <div class="msg-usuario">
+                    <!--
+                                Si el mensaje es del usuario se muestra como un mensaje de usuario
+                                -->
+                    <div class="burbuja-msg-usuario">{{ $mensaje->contenido }}</div>
+                </div>
+            @else
+                <div class="msg-ia">
+                    <!--
+                                Si el mensaje es de la ia se muestra como un mensaje de ia
+                                -->
+                    <div class="avatar-msg-ia">
+                        <img src="/images/logoPAI.png" alt="PAI">
+                    </div>
+                    <div class="burbuja-msg-ia">{{ $mensaje->contenido }}</div>
+                </div>
+            @endif
+        @empty
+            <!--
+                    Si no hay mensajes en la conversación, se muestra un estado vacio
+                    -->
+            <div class="estado-vacio">
+                <div class="icono-vacio">
+                    <img src="/images/logoPAI.png" alt="PAI">
+                </div>
+                <div class="titulo-vacio">Hola, {{ auth()->user()->name }}</div>
+                <p class="sub-vacio">Soy PAI, tu asistente personal. Escribe un mensaje para comenzar.</p>
+            </div>
+        @endforelse
+
+        <!--
+            Si la ia esta escribiendo, se muestra un estado de escribiendo
+            -->
+        <div id="escribiendo-ui" style="display:none" class="indicador-escribiendo">
+            <div class="avatar-msg-ia">
+                <img src="/images/logoPAI.png" alt="PAI" id="logo-escribiendo">
+            </div>
+            <div class="puntos-escribiendo">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+
+    </div>
+    <!--
+        Área de entrada de mensajes
+        -->
+    <div class="area-entrada">
+        <div class="envoltura-entrada">
+            <textarea id="entrada-mensaje" rows="1" placeholder="Escribe tu mensaje..." onkeydown="manejarTecla(event)"
+                oninput="autoAjustar(this)"></textarea>
+            <button class="btn-enviar" id="btn-enviar" onclick="enviar()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M22 2L11 13" />
+                    <path d="M22 2L15 22 11 13 2 9l20-7z" />
+                </svg>
+            </button>
+        </div>
+        <div class="pista-entrada">Enter para enviar · Shift+Enter para nueva línea</div>
+    </div>
 
 @endsection

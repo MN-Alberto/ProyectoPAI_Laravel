@@ -2,231 +2,90 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request; // manejamos las peticiones http
-use Illuminate\Support\Facades\Gate; // manejamos los permisos
-use App\Models\Mensaje; // manejamos los mensajes
-use App\Models\Conversacion; // manejamos las conversaciones
-
-// class MensajeController extends Controller
-// {
-//     public function store(Request $request, Conversacion $conversacion)
-//     {
-//         Gate::authorize('view', $conversacion); // verificamos si el usuario tiene permiso para ver la conversación
-
-//         $request->validate(['content' => 'required|string|max:10000']); // validamos que el mensaje no esté vacío y no tenga mas de 10000 caracteres
-
-//         // Creamos el mensaje del usuario con el rol y en content
-//         $conversacion->mensajes()->create([
-//             'rol' => 'usuario',
-//             'contenido' => $request->content
-//         ]);
-
-//         // si es el primer mensaje, actualizamos el titulo de la conversación
-//         if ($conversacion->mensajes()->count() === 1) {
-//             // cortamos el primer mensaje a los primeros 60 caracteres
-//             $conversacion->update([
-//                 'tituloConversacion' => mb_substr($request->content, 0, 60)
-//             ]);
-//         }
-
-//         // Obtenemos todos los mensajes de la conversación ordenados por fecha
-//         $mensajes = $conversacion->mensajes()->orderBy('created_at')->get();
-
-//         // Generamos el prompt para la IA con el contexto de la conversación
-//         $prompt = $this->generarPrompt($mensajes);
-
-//         // Creamos el mensaje de la IA en la conversación con content vacío
-//         $mensajeRespuesta = $conversacion->mensajes()->create([
-//             'rol' => 'ia',
-//             'content' => ''
-//         ]);
-
-//         // Generamos la respuesta de la IA en streaming
-//         return response()->stream(
-//             function () use ($prompt, $mensajeRespuesta) {
-//                 // Limpiamos el buffer de salida para evitar problemas de temporizacion y rendimiento
-//                 while (ob_get_level() > 0) {
-//                     ob_end_flush();
-//                 }
-
-//                 // Inicializamos la variable que almacenara la respuesta completa de la IA
-//                 $respuestaCompleta = '';
-
-//                 // Obtenemos la URL de Ollama desde el archivo de configuracion .env
-//                 $hostOllama = env('OLLAMA_HOST', 'http://localhost:11434');
-
-//                 // Preparamos el contexto de la solicitud para la API de Ollama
-//                 $contexto = stream_context_create([
-//                     'http' => [
-//                         'method' => 'POST',
-//                         'header' => "Content-Type: application/json\r\n",
-//                         'content' => json_encode([
-//                             'model' => 'mistral',
-//                             'prompt' => $prompt,
-//                             'stream' => true
-//                         ]),
-//                         'timeout' => 300,
-//                     ]
-//                 ]);
-
-//                 // Abrimos la URL de la API de Ollama en modo lectura para recibir la respuesta en streaming
-//                 // @ antes de fopen es para que no muestre un error si no se pudo conectar
-//                 // si no se pudo abrir la URL, devuelve false
-//                 $stream = @fopen($hostOllama . '/api/generate', 'r', false, $contexto);
-
-//                 // si no se pudo abrir la URL, muestra un error y termina
-//                 if (!$stream) {
-//                     echo "data: " . json_encode(['error' => 'No se pudo conectar con la API de Ollama']) . "\n\n";
-//                     // Fuerza la salida de datos en el buffer
-//                     flush();
-//                     return;
-//                 }
-
-//                 // mientras no se alcance el final del archivo y no se haya interrumpido la conexion
-//                 while (!feof($stream) && !connection_aborted()) {
-//                     // leemos una linea de la respuesta
-//                     $lineaRespuesta = fgets($stream);
-//                     // si la linea es nula, salimos del bucle
-//                     if (empty(trim($lineaRespuesta))) {
-//                         continue;
-//                     }
-
-//                     // Decodificamos la linea JSON
-//                     $data = json_decode(trim($lineaRespuesta), true);
-
-//                     // si la linea no es JSON, salimos del bucle
-//                     if (!$data) {
-//                         continue;
-//                     }
-
-//                     // Obtenemos el token de la respuesta
-//                     $token = $data['respuesta'] ?? '';
-
-//                     // si el token no esta vacio
-//                     if ($token !== '') {
-//                         $respuestaCompleta .= $token; // agregamos el token a la respuesta completa
-//                         echo "data: " . json_encode(['token' => $token]) . "\n\n"; // enviamos el token en formato JSON al usuario
-//                         flush(); // forzamos la salida de datos en el buffer
-//                     }
-
-//                     // si el token es nulo, salimos del bucle
-//                     if ($data['done'] ?? false) {
-//                         break;
-//                     }
-//                 }
-
-//                 fclose($stream); // cerramos la conexion con la API de Ollama
-
-//                 $mensajeRespuesta->update(['content' => $respuestaCompleta]); // actualizamos el mensaje de la IA con la respuesta completa
-
-//                 echo "data: [DONE]\n\n"; // enviamos el token en formato JSON al usuario
-
-//                 flush(); // forzamos la salida de datos en el buffer
-//             }
-//             // devolvemos la respuesta al usuario con los encabezados adecuados
-//             ,
-//             200,
-//             [
-//                 // Control de cache: desactiva el almacenamiento en cache
-//                 'Cache-Control' => 'no-cache',
-//                 // Tipo de content: es una secuencia de eventos (Server-Sent Events)
-//                 'Content-Type' => 'text/event-stream',
-//                 // Desactiva el buffering en servidores nginx
-//                 'X-Accel-Buffering' => 'no',
-//                 // Mantiene la conexion abierta
-//                 'Connection' => 'keep-alive',
-//             ]
-//         );
-//     }
-
-//     private function generarPrompt($mensajes): string
-//     {
-//         // Iniciamos el prompt con el tag de inicio
-//         $prompt = "<s>";
-//         // Recorremos todos los mensajes de la conversación
-//         foreach ($mensajes as $mensaje) {
-
-//             // Si el mensaje es del usuario
-//             if ($mensaje->rol === 'usuario') {
-//                 // Agregamos el mensaje del usuario al prompt en formato [INST]
-//                 $prompt .= "[INST] {$mensaje->content} [/INST]";
-//                 // Agregamos el tag de fin de mensaje del usuario
-//                 $prompt .= " </s>";
-
-//             } elseif ($mensaje->rol === 'ia' && !empty($mensaje->content)) {
-//                 // Agregamos el mensaje de la IA al prompt en formato </s><s>
-//                 $prompt .= " {$mensaje->content} </s><s>";
-//             }
-//         }
-//         return $prompt;
-//     }
-// }
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use App\Models\Mensaje;
+use App\Models\Conversacion;
 
 class MensajeController extends Controller
 {
     public function store(Request $request, Conversacion $conversacion)
     {
+        // Verifica que el usuario tenga permiso para acceder a la conversacion
         Gate::authorize('view', $conversacion);
-
+        // Valida que el contenido del mensaje sea correcto
         $request->validate(['content' => 'required|string|max:10000']);
 
+        // Crea el mensaje en la base de datos
         $conversacion->mensajes()->create([
             'rol' => 'usuario',
             'contenido' => $request->content,
         ]);
 
+        // Si es el primer mensaje se actualiza el titulo de la conversacion
         if ($conversacion->mensajes()->count() === 1) {
             $conversacion->update([
                 'tituloConversacion' => mb_substr($request->content, 0, 60),
             ]);
         }
 
+        // Obtiene todos los mensajes ordenados por fecha
         $mensajes = $conversacion->mensajes()->orderBy('created_at')->get();
+        // Genera el prompt para la ia
         $prompt = $this->generarPrompt($mensajes);
 
-        $ollamaHost = env('OLLAMA_HOST', 'http://ollama:11434');
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'POST',
-                'header' => "Content-Type: application/json\r\n",
-                'content' => json_encode([
-                    'model' => 'mistral',
-                    'prompt' => $prompt,
-                    'stream' => false,
-                ]),
-                'timeout' => 300,
-            ],
-        ]);
-
-        $respuesta = @file_get_contents($ollamaHost . '/api/generate', false, $context);
-
-        if (!$respuesta) {
-            return response()->json(['error' => 'No se puede conectar con Ollama.'], 500);
-        }
-
-        $data = json_decode($respuesta, true);
-        $contenido = $data['response'] ?? 'Sin respuesta.';
-
-        $conversacion->mensajes()->create([
+        // Crea el mensaje de respuesta en la base de datos
+        $mensajeRespuesta = $conversacion->mensajes()->create([
             'rol' => 'ia',
-            'contenido' => $contenido,
+            'contenido' => ''
         ]);
+        // Devuelve el prompt y el id del mensaje de respuesta
+        return response()->json([
+            'prompt' => $prompt,
+            'mensaje_id' => $mensajeRespuesta->id,
+        ]);
+    }
 
-        return response()->json(['response' => $contenido]);
+    public function guardarRespuesta(Request $request, Conversacion $conversacion, Mensaje $mensaje)
+    {
+        // Verifica que el usuario tenga permiso para acceder a la conversacion
+        Gate::authorize('view', $conversacion);
+        // Valida que el contenido del mensaje sea correcto
+        $request->validate(['contenido' => 'required|string']);
+        // Actualiza el contenido del mensaje
+        $mensaje->update(['contenido' => $request->contenido]);
+        // Devuelve que todo ha ido bien
+        return response()->json(['ok' => true]);
     }
 
     private function generarPrompt($mensajes): string
     {
-        $prompt = "<s>[INST] Eres un asistente útil. Responde siempre en el mismo idioma que el usuario. No traduzcas ni pongas texto entre paréntesis en otro idioma. [/INST] Entendido, responderé siempre en el idioma del usuario.</s><s>";
+        // Genera el prompt para la ia
+        $prompt = "<s>[INST] <<SYS>>\nYou are a helpful assistant. Always respond in the same language the user uses. If the user writes in Spanish, respond in Spanish only. If the user writes in English, respond in English only. Never mix languages or add translations in parentheses.\n<</SYS>>\n\n";
 
+        // Variable para saber si es el primer mensaje
+        $primera = true;
+        // Itera sobre los mensajes
         foreach ($mensajes as $mensaje) {
+            // Si el mensaje es del usuario
             if ($mensaje->rol === 'usuario') {
-                $prompt .= "[INST] {$mensaje->contenido} [/INST]";
+                // Si es el primer mensaje
+                if ($primera) {
+                    // Asigna el contenido del mensaje de usuario al prompt
+                    $prompt .= "{$mensaje->contenido} [/INST]";
+                    // Cambia a false para que no sea el primer mensaje
+                    $primera = false;
+                } else {
+                    // Asigna el contenido del mensaje de usuario al prompt
+                    $prompt .= "[INST] {$mensaje->contenido} [/INST]";
+                }
+                // Si el mensaje es de ia y no esta vacio
             } elseif ($mensaje->rol === 'ia' && !empty($mensaje->contenido)) {
+                // Asigna el contenido del mensaje de ia al prompt
                 $prompt .= " {$mensaje->contenido}</s><s>";
             }
         }
+        // Devuelve el prompt
         return $prompt;
     }
 }

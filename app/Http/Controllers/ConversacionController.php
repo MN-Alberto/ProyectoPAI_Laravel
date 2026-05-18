@@ -28,6 +28,15 @@ class ConversacionController extends Controller
     // Crear una nueva conversación
     public function store()
     {
+        // Si ya hay una conversación vacía, redirigimos a esa en vez de crear otra
+        // Con esto evitamos que un usuario cree un monton de conversaciones vacias con el boton de nueva conversacion
+        $conversacionVacia = auth()->user()->conversaciones()->doesntHave('mensajes')->first();
+        // Si hay una conversacion vacia
+        if ($conversacionVacia) {
+            // redirige a la conversación vacia existente
+            return redirect()->route('conversaciones.show', $conversacionVacia);
+        }
+
         // Crear una nueva conversación llamada "Nuevo chat"
         $conversacion = auth()->user()->conversaciones()->create([
             'tituloConversacion' => 'Nuevo chat',
