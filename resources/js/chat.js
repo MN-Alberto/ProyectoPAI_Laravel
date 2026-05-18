@@ -91,6 +91,16 @@ function agregarMensaje(rol, contenido) {
                 // Asigna el texto al titulo de la conversacion
                 activeConv.textContent = texto;
             }
+            // Reactiva el botón de nueva conversación ya que la actual ya no está vacía
+            const btnNueva = document.getElementById('btn-nueva-conv');
+            // Si el boton de nueva conversacion existe
+            if (btnNueva) {
+                // Habilita el boton de nueva conversacion
+                btnNueva.disabled = false;
+                // Asigna el estilo al boton de nueva conversacion
+                btnNueva.style.opacity = '1';
+                btnNueva.style.cursor = 'pointer';
+            }
         }
     }
     // Variable que almacena el estado de escribiendo
