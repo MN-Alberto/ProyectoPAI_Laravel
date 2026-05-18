@@ -16,10 +16,12 @@
                     <div class="burbuja-msg-usuario">{{ $mensaje->contenido }}</div>
                 </div>
             @else
-                <div class="avatar-msg-ia">
-                    <img src="/images/logoPAI.png" alt="PAI">
+                <div class="msg-ia">
+                    <div class="avatar-msg-ia">
+                        <img src="/images/logoPAI.png" alt="PAI">
+                    </div>
+                    <div class="burbuja-msg-ia">{{ $mensaje->contenido }}</div>
                 </div>
-                <div class="burbuja-msg-ia">{{ $mensaje->contenido }}</div>
             @endif
         @empty
             <div class="estado-vacio">

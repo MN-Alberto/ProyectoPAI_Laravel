@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'PAI') }}</title>
+        <link rel="icon" href="/images/logoPAI.png" type="image/png">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/css/chat.css', 'resources/js/app.js', 'resources/js/chat.js'])

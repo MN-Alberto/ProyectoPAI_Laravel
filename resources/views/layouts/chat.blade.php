@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>PAI</title>
+    <link rel="icon" href="/images/logoPAI.png" type="image/png">
     @vite(['resources/css/chat.css', 'resources/js/chat.js'])
 </head>
 
-<body>
+<body class="light">
 
     <aside class="barra-lateral">
         <div class="barra-lateral-cabecera">
