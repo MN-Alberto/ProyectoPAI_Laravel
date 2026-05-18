@@ -124,27 +124,29 @@ function agregarMensaje(rol, contenido) {
     container.insertBefore(div, typing);
     // Desplaza la ventana del chat hacia abajo
     window.desplazarAbajo();
+    return div;
 }
 
 // Maneja el envío de mensajes
 window.enviar = async function () {
-    // Variable que almacena el area de entrada de mensajes
+    // Variable que almacena el input
     const input = document.getElementById('entrada-mensaje');
-    // Variable que almacena el contenido del mensaje
+    // Variable que almacena el contenido del input
     const content = input.value.trim();
-    // Si el contenido es nulo o el estado de carga es true
+    // Si el contenido es nulo o la ventana se esta enviando
     if (!content || window.enviando) return;
-    // Limpia el area de entrada de mensajes
+    // Limpia el input
     input.value = '';
-    // Ajusta la altura del area de entrada de mensajes
+    // Limpia el alto del input
     input.style.height = 'auto';
-    // Agrega el mensaje de usuario
+    // Agrega el mensaje del usuario
     agregarMensaje('usuario', content);
-    // Establece el estado de carga
+    // Establece el estado de cargando
     window.establecerCargando(true);
-    // Intentamos enviar la peticion
+
+    // Intenta realizar la peticion a la api
     try {
-        // Obtenemos la respuesta de la IA
+        // PHP guarda mensaje usuario y nos devuelve el prompt
         const res = await fetch('/conversaciones/' + window.ID_CONVERSACION + '/mensajes', {
             // Metodo de la peticion
             method: 'POST',
@@ -156,23 +158,116 @@ window.enviar = async function () {
             // Cuerpo de la peticion
             body: JSON.stringify({ content }),
         });
-        // Obtenemos la respuesta de la IA
-        const data = await res.json();
-        // Si la respuesta es un error
-        if (data.error) {
-            // Agrega el mensaje de error
-            agregarMensaje('ia', 'Error: ' + data.error);
-        } else {
-            // Si la respuesta es correcta
-            agregarMensaje('ia', data.response);
+
+        // Si la respuesta no es correcta
+        if (!res.ok) {
+            // Lanza un error
+            throw new Error('Error al guardar mensaje en el servidor (' + res.status + ')');
         }
+
+        // Variable que almacena el prompt y el id del mensaje
+        const { prompt, mensaje_id } = await res.json();
+
+        // Streaming directo a Ollama
+        const ollamaRes = await fetch('http://localhost:11434/api/generate', {
+            // Metodo de la peticion
+            method: 'POST',
+            // Cabeceras de la peticion
+            headers: { 'Content-Type': 'application/json' },
+            // Cuerpo de la peticion
+            body: JSON.stringify({ model: 'mistral', prompt: prompt, stream: true }),
+        });
+        // Si la respuesta no es correcta
+        if (!ollamaRes.ok) {
+            // Lanza un error
+            throw new Error('Error al conectar con Ollama (' + ollamaRes.status + ')');
+        }
+        // Variable que almacena el lector de la respuesta
+        const reader = ollamaRes.body.getReader();
+        // Variable que decodifica la respuesta
+        const decoder = new TextDecoder('utf-8');
+
+        // Variable que almacena la burbuja del mensaje de ia
+        let burbujaIa = null;
+        // Variable que almacena la respuesta completa
+        let respuestaCompleta = '';
+        // Variable que almacena si es el primer token
+        let primerToken = true;
+        // Variable que almacena el buffer de la respuesta
+        let bufferStr = '';
+
+        // Bucle que se ejecuta mientras no se reciba la señal de fin
+        while (true) {
+            // Lee la respuesta
+            const { done, value } = await reader.read();
+            // Si se ha recibido la señal de fin
+            if (done) break;
+            // Añade la respuesta al buffer
+            bufferStr += decoder.decode(value, { stream: true });
+            // Divide la respuesta en lineas
+            const lineas = bufferStr.split('\n');
+            // Elimina la ultima linea
+            bufferStr = lineas.pop(); // Mantener línea incompleta en el buffer
+            // Itera sobre las lineas
+            for (const linea of lineas) {
+                // Si la linea esta vacia
+                if (!linea.trim()) continue;
+                // Intenta realizar la peticion a la api
+                try {
+                    // Variable que almacena los datos de la peticion
+                    const data = JSON.parse(linea);
+                    // Variable que almacena el token de la peticion
+                    const token = data.response ?? '';
+                    // Si el token no esta vacio
+                    if (token !== '') {
+                        // Si es el primer token
+                        if (primerToken) {
+                            // Oculta el estado de escribiendo
+                            document.getElementById('escribiendo-ui').style.display = 'none';
+                            // Agrega el mensaje de ia
+                            burbujaIa = agregarMensaje('ia', '').querySelector('.burbuja-msg-ia');
+                            // Cambia a false para que no sea el primer token
+                            primerToken = false;
+                        }
+                        // Añade el token a la respuesta completa
+                        respuestaCompleta += token;
+                        // Añade el token a la burbuja del mensaje de ia
+                        burbujaIa.textContent += token;
+                        // Desplaza la ventana del chat hacia abajo
+                        window.desplazarAbajo();
+                    }
+                    // Si se ha recibido la señal de fin
+                    if (data.done) break;
+                } catch (e) {
+                    console.error('Error parseando JSON de Ollama:', e, linea);
+                }
+            }
+        }
+        // PHP guarda la respuesta completa
+        const guardarRes = await fetch('/conversaciones/' + window.ID_CONVERSACION + '/mensajes/' + mensaje_id + '/guardar', {
+            // Metodo de la peticion
+            method: 'POST',
+            // Cabeceras de la peticion
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': window.TOKEN_CSRF,
+            },
+            // Cuerpo de la peticion
+            body: JSON.stringify({ contenido: respuestaCompleta }),
+        });
+        // Si la respuesta no es correcta
+        if (!guardarRes.ok) {
+            // Lanza un error
+            throw new Error('Error al persistir la respuesta de la IA (' + guardarRes.status + ')');
+        }
+
     } catch (err) {
-        // Si hay un error de conexion
+        // Agrega el mensaje de error
         agregarMensaje('ia', 'Error de conexión: ' + err.message);
     } finally {
-        // Finalizamos el estado de carga
+        // Establece el estado de cargando
         window.establecerCargando(false);
-        // Ponemos el foco en el area de entrada de mensajes
+        // Enfoca el input
         document.getElementById('entrada-mensaje').focus();
     }
 }

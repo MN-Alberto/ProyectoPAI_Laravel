@@ -32,7 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/conversaciones/{conversacion}', [ConversacionController::class, 'destroy'])->name('conversaciones.destroy');
     //Rutas para guardar los mensajes
     Route::post('/conversaciones/{conversacion}/mensajes', [MensajeController::class, 'store'])->name('mensajes.store');
-
+    //Rutas para guardar la respuesta de la ia en la base de datos
+    Route::post('/conversaciones/{conversacion}/mensajes/{mensaje}/guardar', [MensajeController::class, 'guardarRespuesta']);
 });
 
 //Rutas para la autenticación
