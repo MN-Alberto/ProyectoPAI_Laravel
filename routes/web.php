@@ -16,6 +16,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     //Rutas para actualizar el perfil del usuario
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    //Rutas para actualizar el perfil desde el chat modal
+    Route::patch('/profile/actualizar-usuario', [ProfileController::class, 'actualizarUsuario'])->name('profile.actualizar-usuario');
     //Rutas para eliminar el perfil del usuario
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

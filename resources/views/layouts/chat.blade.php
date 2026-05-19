@@ -47,29 +47,29 @@
             -->
             @forelse ($conversaciones as $conv)
                 <!--
-                    Si la conversacion actual es la que se esta mostrando, se marca como active
-                    -->
+                                Si la conversacion actual es la que se esta mostrando, se marca como active
+                                -->
                 <div class="item-conv {{ isset($conversacion) && $conversacion->id === $conv->id ? 'active' : '' }}">
                     <svg class="icono-conv-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
                     </svg>
                     <!--
-                        Muestra el titulo de la conversacion
-                        -->
+                                    Muestra el titulo de la conversacion
+                                    -->
                     <a href="{{ route('conversaciones.show', $conv) }}" class="titulo-conv">
                         {{ $conv->tituloConversacion }}
                     </a>
                     <!--
-                        Formulario para eliminar la conversacion
-                        -->
+                                    Formulario para eliminar la conversacion
+                                    -->
                     <form action="{{ route('conversaciones.destroy', $conv) }}" method="POST"
                         onsubmit="return confirm('¿Eliminar?')">
                         @csrf
                         @method('DELETE')
                         <!--
-                            Boton para eliminar la conversacion
-                            -->
+                                        Boton para eliminar la conversacion
+                                        -->
                         <button type="submit" class="eliminar-conv" title="Eliminar">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -80,8 +80,8 @@
                 </div>
             @empty
                 <!--
-                    Si no hay conversaciones, se muestra un mensaje
-                    -->
+                                Si no hay conversaciones, se muestra un mensaje
+                                -->
                 <div class="vacio-conv">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -138,6 +138,83 @@
         -->
         @yield('content')
     </main>
+
+    <!-- Modal para editar perfil -->
+    <div id="modal-perfil" class="modal-overlay"
+        style="display: {{ ($errors->any() || session('status') === 'profile-chat-updated') ? 'flex' : 'none' }}">
+        <div class="modal-contenedor">
+            <div class="modal-cabecera">
+                <h3 class="modal-titulo">Editar Perfil</h3>
+                <button type="button" id="btn-cerrar-modal" class="modal-cerrar-svg">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <!--
+            Formulario para actualizar el perfil
+            -->
+            <form action="{{ route('profile.actualizar-usuario') }}" method="POST" class="modal-formulario">
+                @csrf
+                <!--
+                Se especifica que el método es PATCH para que Laravel pueda actualizar el perfil
+                -->
+                @method('PATCH')
+
+                @if ($errors->any())
+                    <!--
+                            Si hay errores, se muestra un mensaje
+                            -->
+                    <div class="alerta-error">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+                <!--
+                Si hay un mensaje de éxito, se muestra un mensaje
+                -->
+                @if (session('status') === 'profile-chat-updated')
+                    <div class="alerta-exito">
+                        ¡Perfil actualizado correctamente!
+                    </div>
+                @endif
+
+                <div class="grupo-formulario">
+                    <label for="modal-nombre">Nombre</label>
+                    <input type="text" id="modal-nombre" name="name" value="{{ old('name', auth()->user()->name) }}"
+                        required autocomplete="name">
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="modal-current-password">Contraseña Actual</label>
+                    <input type="password" id="modal-current-password" name="current_password"
+                        placeholder="Introduce tu contraseña actual" required autocomplete="current-password">
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="modal-password">Nueva Contraseña</label>
+                    <input type="password" id="modal-password" name="password"
+                        placeholder="Mínimo 8 caracteres (opcional)" autocomplete="new-password">
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="modal-password-confirm">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="modal-password-confirm" name="password_confirmation"
+                        placeholder="Repite la contraseña" autocomplete="new-password">
+                </div>
+
+                <div class="modal-acciones">
+                    <button type="button" id="btn-cancelar-modal" class="btn-secundario">Cancelar</button>
+                    <button type="submit" class="btn-primario">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 </body>
 
