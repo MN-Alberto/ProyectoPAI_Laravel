@@ -17,25 +17,17 @@
     </script>
 
     <div id="contenedor-mensajes">
-        <!--
-            Recorre todos los mensajes de la conversación
-            -->
+        <!--Recorre todos los mensajes de la conversación-->
         @forelse ($mensajes as $mensaje)
-            <!--
-                    Si el mensaje es del usuario, se muestra como un mensaje de usuario y si no como un mensaje de ia
-                    -->
+            <!--Si el mensaje es del usuario, se muestra como un mensaje de usuario y si no como un mensaje de ia-->
             @if ($mensaje->rol === 'usuario')
                 <div class="msg-usuario">
-                    <!--
-                                Si el mensaje es del usuario se muestra como un mensaje de usuario
-                                -->
+                    <!--Si el mensaje es del usuario se muestra como un mensaje de usuario-->
                     <div class="burbuja-msg-usuario">{{ $mensaje->contenido }}</div>
                 </div>
             @else
                 <div class="msg-ia">
-                    <!--
-                                Si el mensaje es de la ia se muestra como un mensaje de ia
-                                -->
+                    <!--Si el mensaje es de la ia se muestra como un mensaje de ia-->
                     <div class="avatar-msg-ia">
                         <img src="/images/logoPAI.png" alt="PAI">
                     </div>
@@ -43,9 +35,7 @@
                 </div>
             @endif
         @empty
-            <!--
-                    Si no hay mensajes en la conversación, se muestra un estado vacio
-                    -->
+            <!--Si no hay mensajes en la conversación, se muestra un estado vacio-->
             <div class="estado-vacio">
                 <div class="icono-vacio">
                     <img src="/images/logoPAI.png" alt="PAI">
@@ -55,9 +45,7 @@
             </div>
         @endforelse
 
-        <!--
-            Si la ia esta escribiendo, se muestra un estado de escribiendo
-            -->
+        <!--Si la ia esta escribiendo, se muestra un estado de escribiendo-->
         <div id="escribiendo-ui" style="display:none" class="indicador-escribiendo">
             <div class="avatar-msg-ia">
                 <img src="/images/logoPAI.png" alt="PAI" id="logo-escribiendo">
@@ -68,9 +56,7 @@
         </div>
 
     </div>
-    <!--
-        Área de entrada de mensajes
-        -->
+    <!--Área de entrada de mensajes-->
     <div class="area-entrada">
         <div class="envoltura-entrada">
             <textarea id="entrada-mensaje" rows="1" placeholder="Escribe tu mensaje..." onkeydown="manejarTecla(event)"

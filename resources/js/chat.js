@@ -297,4 +297,68 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // Desplaza la ventana del chat hacia abajo
     window.desplazarAbajo();
+
+    // Modal de perfil
+    const avatar = document.querySelector('.avatar-usuario');
+    const modal = document.getElementById('modal-perfil');
+    const btnCerrar = document.getElementById('btn-cerrar-modal');
+    const btnCancelar = document.getElementById('btn-cancelar-modal');
+
+    // Cierra el modal y limpia los campos
+    function cerrarYLimpiarModal() {
+        // Si el modal existe
+        if (modal) {
+            // Oculta el modal
+            modal.style.display = 'none';
+
+            // Limpiar campos de contraseña
+            const inputCurrent = document.getElementById('modal-current-password');
+            const inputNew = document.getElementById('modal-password');
+            const inputConfirm = document.getElementById('modal-password-confirm');
+
+            // Si el campo existe se limpia
+            if (inputCurrent) inputCurrent.value = '';
+            // Si el campo existe se limpia
+            if (inputNew) inputNew.value = '';
+            // Si el campo existe se limpia
+            if (inputConfirm) inputConfirm.value = '';
+
+            // Variables que almacenan los mensajes de alerta de error y exito
+            const alertaError = modal.querySelector('.alerta-error');
+            const alertaExito = modal.querySelector('.alerta-exito');
+            // Si existe se elimina la alerta de error
+            if (alertaError) alertaError.remove();
+            // Si existe se elimina la alerta de exito
+            if (alertaExito) alertaExito.remove();
+        }
+    }
+
+    // Si el avatar y el modal existen se agrega un evento de click al avatar
+    if (avatar && modal) {
+        // Evento que abre el modal al hacer click en el avatar
+        avatar.addEventListener('click', function () {
+            // Muestra el modal
+            modal.style.display = 'flex';
+        });
+    }
+
+    // Si el modal existe
+    if (modal) {
+        // Si el boton de cerrar existe se agrega un evento de click
+        if (btnCerrar) {
+            btnCerrar.addEventListener('click', cerrarYLimpiarModal);
+        }
+        // Si el boton de cancelar existe se agrega un evento de click
+        if (btnCancelar) {
+            btnCancelar.addEventListener('click', cerrarYLimpiarModal);
+        }
+        // Si el modal existe se agrega un evento de click
+        modal.addEventListener('click', function (e) {
+            // Si el objetivo del click es el modal
+            if (e.target === modal) {
+                // Se cierra y limpia el modal
+                cerrarYLimpiarModal();
+            }
+        });
+    }
 });
