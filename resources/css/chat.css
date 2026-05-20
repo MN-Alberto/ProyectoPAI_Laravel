@@ -609,6 +609,60 @@ main {
     height: 16px;
 }
 
+/* Botón de detener generación */
+.btn-detener {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: #f87171;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    animation: fadeInModal 0.2s ease;
+}
+
+.btn-detener:hover {
+    background: #ef4444;
+    transform: scale(1.05);
+}
+
+.btn-detener svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Botón de reanudar generación */
+.btn-reanudar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: #34d399;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    animation: fadeInModal 0.2s ease;
+}
+
+.btn-reanudar:hover {
+    background: #10b981;
+    transform: scale(1.05);
+}
+
+.btn-reanudar svg {
+    width: 16px;
+    height: 16px;
+}
+
 .pista-entrada {
     text-align: center;
     font-size: 11px;

@@ -68,6 +68,18 @@
                     <path d="M22 2L15 22 11 13 2 9l20-7z" />
                 </svg>
             </button>
+            <!--Botón para detener la generación de la IA-->
+            <button class="btn-detener" id="btn-detener" style="display:none" onclick="detenerGeneracion()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                </svg>
+            </button>
+            <!--Botón para reanudar la generación de la IA-->
+            <button class="btn-reanudar" id="btn-reanudar" style="display:none" onclick="reanudarGeneracion()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <polygon points="6,4 20,12 6,20" />
+                </svg>
+            </button>
         </div>
         <div class="pista-entrada">Enter para enviar · Shift+Enter para nueva línea</div>
     </div>
