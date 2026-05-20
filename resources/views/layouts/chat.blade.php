@@ -63,14 +63,13 @@
                     <!--
                                     Formulario para eliminar la conversacion
                                     -->
-                    <form action="{{ route('conversaciones.destroy', $conv) }}" method="POST"
-                        onsubmit="return confirm('¿Eliminar?')">
+                    <form action="{{ route('conversaciones.destroy', $conv) }}" method="POST" style="margin:0">
                         @csrf
                         @method('DELETE')
                         <!--
                                         Boton para eliminar la conversacion
                                         -->
-                        <button type="submit" class="eliminar-conv" title="Eliminar">
+                        <button type="button" class="eliminar-conv btn-abrir-eliminar" title="Eliminar">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M18 6L6 18M6 6l12 12" />
@@ -213,6 +212,31 @@
                     <button type="submit" class="btn-primario">Guardar cambios</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal para eliminar conversación -->
+    <div id="modal-eliminar" class="modal-overlay" style="display: none">
+        <div class="modal-contenedor">
+            <div class="modal-cabecera">
+                <h3 class="modal-titulo">Eliminar conversación</h3>
+                <button type="button" id="btn-cerrar-modal-eliminar" class="modal-cerrar-svg">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-formulario">
+                <p style="color: var(--texto-atenuado); font-size: 14px; line-height: 1.6; margin-bottom: 20px;">
+                    ¿Estás seguro de que deseas eliminar esta conversación? Todos los mensajes se perderán permanentemente.
+                </p>
+                <div class="modal-acciones">
+                    <button type="button" id="btn-cancelar-modal-eliminar" class="btn-secundario">Cancelar</button>
+                    <button type="button" id="btn-confirmar-eliminar" class="btn-primario" style="background: linear-gradient(135deg, #f87171, #ef4444); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">Eliminar</button>
+                </div>
+            </div>
         </div>
     </div>
 
