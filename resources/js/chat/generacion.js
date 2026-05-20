@@ -68,7 +68,7 @@ window.reanudarGeneracion = async function () {
     if (btnReanudar) btnReanudar.style.display = 'none';
 
     window.establecerCargando(true);
-    // Oculta el indicador de escribiendo porque ya existe la burbuja
+    // Oculta el indicador de escribiendo porque ya existe la burbuja, a menos que el modelo se esté cargando
     document.getElementById('escribiendo-ui').style.display = 'none';
     window.generacionDetenida = false;
 
@@ -80,13 +80,39 @@ window.reanudarGeneracion = async function () {
     try {
         window.controladorAborto = new AbortController();
 
+        const modelName = window.MODELO_ACTUAL || 'mistral';
+        let modelLoaded = false;
+        try {
+            console.log('Verificando si el modelo ' + modelName + ' está cargado en memoria para reanudar...');
+            const psRes = await fetch('http://localhost:11434/api/ps');
+            if (psRes.ok) {
+                const psData = await psRes.json();
+                modelLoaded = psData.models && psData.models.some(m => m.name.startsWith(modelName));
+            }
+        } catch (e) {
+            console.warn('Error al verificar modelo en reanudación:', e);
+            modelLoaded = true;
+        }
+
+        if (!modelLoaded) {
+            console.log('El modelo no está cargado. Mostrando mensaje de carga durante la reanudación...');
+            const escribiendoUi = document.getElementById('escribiendo-ui');
+            if (escribiendoUi) {
+                escribiendoUi.style.display = 'flex';
+                const puntosDiv = escribiendoUi.querySelector('.puntos-escribiendo');
+                if (puntosDiv) {
+                    puntosDiv.innerHTML = '<div class="texto-cargando-modelo">Cargando el modelo en memoria, por favor espere...</div>';
+                }
+            }
+        }
+
         // El prompt de reanudación es el prompt original más la respuesta acumulada
         const promptContinuacion = promptOriginal + '\n' + respuestaAcumulada;
 
         const ollamaRes = await fetch('http://localhost:11434/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'mistral', prompt: promptContinuacion, stream: true }),
+            body: JSON.stringify({ model: modelName, prompt: promptContinuacion, stream: true }),
             signal: window.controladorAborto.signal,
         });
 
@@ -153,17 +179,50 @@ window.enviar = async function () {
             throw new Error('Error al guardar mensaje en el servidor (' + res.status + ')');
         }
 
+        // Obtenemos la respuesta de PHP con el prompt y el id del mensaje
         const datosServidor = await res.json();
         promptOriginal = datosServidor.prompt;
         idMensajeIa = datosServidor.mensaje_id;
 
         window.controladorAborto = new AbortController();
 
+        // Obtenemos el modelo actual, por defecto mistral
+        const modelName = window.MODELO_ACTUAL || 'mistral';
+
+        // Verificamos si el modelo está cargado en memoria
+        let modelLoaded = false;
+        try {
+            console.log('Verificando si el modelo ' + modelName + ' está cargado en memoria...');
+            // Hacemos una petición a la API de Ollama para comprobar si el modelo está cargado
+            const psRes = await fetch('http://localhost:11434/api/ps');
+            // Si la petición es exitosa comprobamos si el modelo está cargado
+            if (psRes.ok) {
+                const psData = await psRes.json();
+                // Si el modelo está cargado, guardamos la respuesta en la burbuja del mensaje
+                modelLoaded = psData.models && psData.models.some(m => m.name.startsWith(modelName));
+            }
+        } catch (e) {
+            console.warn('Error al comprobar modelos cargados en Ollama:', e);
+            modelLoaded = true;
+        }
+
+        // Si el modelo no está cargado mostramos mensaje de carga en la burbuja del mensaje
+        if (!modelLoaded) {
+            console.log('El modelo no está cargado. Mostrando mensaje de carga...');
+            const puntosDiv = document.querySelector('.puntos-escribiendo');
+            // Si existe la burbuja de IA mostramos el mensaje de carga
+            if (puntosDiv) {
+                puntosDiv.innerHTML = '<div class="texto-cargando-modelo">Cargando el modelo en memoria, por favor espere...</div>';
+            }
+        } else {
+            console.log('El modelo ya está en memoria. Puntos normales.');
+        }
+
         // Streaming directo a Ollama con señal de aborto
         const ollamaRes = await fetch('http://localhost:11434/api/generate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: 'mistral', prompt: promptOriginal, stream: true }),
+            body: JSON.stringify({ model: modelName, prompt: promptOriginal, stream: true }),
             signal: window.controladorAborto.signal,
         });
 
@@ -193,6 +252,10 @@ window.enviar = async function () {
                     if (token !== '') {
                         if (primerToken) {
                             document.getElementById('escribiendo-ui').style.display = 'none';
+                            const puntosDiv = document.querySelector('.puntos-escribiendo');
+                            if (puntosDiv) {
+                                puntosDiv.innerHTML = '<span></span><span></span><span></span>';
+                            }
                             burbujaIaRef = agregarMensaje('ia', '').querySelector('.burbuja-msg-ia');
                             primerToken = false;
                         }

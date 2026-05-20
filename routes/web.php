@@ -20,6 +20,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/actualizar-usuario', [ProfileController::class, 'actualizarUsuario'])->name('profile.actualizar-usuario');
     //Rutas para eliminar el perfil del usuario
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    //Rutas para cambiar el modelo
+    Route::patch('/conversaciones/{conversacion}/modelo', [MensajeController::class, 'cambiarModelo'])->name('conversaciones.modelo');
 });
 
 //Rutas para las conversaciones

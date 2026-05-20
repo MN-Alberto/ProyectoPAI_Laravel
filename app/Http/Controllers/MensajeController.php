@@ -9,6 +9,13 @@ use App\Models\Conversacion;
 
 class MensajeController extends Controller
 {
+    // Modelos disponibles
+    const MODELOS = [
+        'chat' => 'mistral',
+        'rapido' => 'phi3',
+        'codigo' => 'deepseek-coder',
+        'ligero' => 'tinyllama',
+    ];
     public function store(Request $request, Conversacion $conversacion)
     {
         // Verifica que el usuario tenga permiso para acceder a la conversacion
@@ -37,12 +44,14 @@ class MensajeController extends Controller
         // Crea el mensaje de respuesta en la base de datos
         $mensajeRespuesta = $conversacion->mensajes()->create([
             'rol' => 'ia',
-            'contenido' => ''
+            'contenido' => '',
+            'modelo' => $conversacion->modelo,
         ]);
-        // Devuelve el prompt y el id del mensaje de respuesta
+        // Devuelve el prompt, el id del mensaje de respuesta y el modelo
         return response()->json([
             'prompt' => $prompt,
             'mensaje_id' => $mensajeRespuesta->id,
+            'modelo' => $conversacion->modelo,
         ]);
     }
 
@@ -58,9 +67,24 @@ class MensajeController extends Controller
         return response()->json(['ok' => true]);
     }
 
+
+    public function cambiarModelo(Request $request, Conversacion $conversacion)
+    {
+        // Verifica que el usuario tenga permiso para acceder a la conversacion
+        Gate::authorize('view', $conversacion);
+        // Valida que el modelo sea correcto
+        $request->validate([
+            'modelo' => 'required|string|in:' . implode(',', self::MODELOS),
+        ]);
+        // Actualiza el modelo
+        $conversacion->update(['modelo' => $request->modelo]);
+        // Devuelve que todo ha ido bien y el modelo
+        return response()->json(['ok' => true, 'modelo' => $request->modelo]);
+    }
+
     private function generarPrompt($mensajes): string
     {
-        // Genera el prompt para la ia
+        // Genera el prompt para que la ia no se vuelva loca y traduzca la respuesta al ingles o otro idioma
         $prompt = "<s>[INST] <<SYS>>\nYou are a helpful assistant. Always respond in the same language the user uses. If the user writes in Spanish, respond in Spanish only. If the user writes in English, respond in English only. Never mix languages or add translations in parentheses.\n<</SYS>>\n\n";
 
         // Variable para saber si es el primer mensaje

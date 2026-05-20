@@ -66,6 +66,13 @@ window.establecerCargando = function (state) {
         btnDetener.style.display = state ? 'flex' : 'none';
         btnEnviar.style.display = state ? 'none' : 'flex';
     }
+    // Si no está cargando reinicia los puntos de escribiendo
+    if (!state) {
+        const puntosDiv = document.querySelector('.puntos-escribiendo');
+        if (puntosDiv) {
+            puntosDiv.innerHTML = '<span></span><span></span><span></span>';
+        }
+    }
     if (state) window.desplazarAbajo();
 }
 
@@ -104,7 +111,15 @@ export function agregarMensaje(rol, contenido) {
         div.innerHTML = '<div class="burbuja-msg-usuario">' + escaparHtml(contenido) + '</div>';
     } else {
         div.className = 'msg-ia';
-        div.innerHTML = '<div class="avatar-msg-ia"><img src="/images/logoPAI.png" alt="PAI"></div><div class="burbuja-msg-ia">' + escaparHtml(contenido) + '</div>';
+        const nombresModelos = {
+            'mistral': 'Mistral 7B',
+            'phi3': 'Phi-3 3.8B',
+            'deepseek-coder': 'DeepSeek Coder 6.7B',
+            'tinyllama': 'TinyLlama 1.1B'
+        };
+        const modelKey = window.MODELO_ACTUAL || 'mistral';
+        const modelLabel = nombresModelos[modelKey] || modelKey;
+        div.innerHTML = '<div class="avatar-msg-ia"><img src="/images/logoPAI.png" alt="PAI"></div><div class="envoltura-burbuja-ia"><div class="modelo-nombre-tag">' + modelLabel + '</div><div class="burbuja-msg-ia">' + escaparHtml(contenido) + '</div></div>';
     }
     // Inserta el mensaje en el contenedor
     container.insertBefore(div, typing);
@@ -130,6 +145,7 @@ export async function guardarMensajeEnServidor(idMensajeIa, contenido) {
 export async function leerStreamOllama(reader, burbuja, acumulador) {
     const decoder = new TextDecoder('utf-8');
     let bufferStr = '';
+    let primerToken = true;
 
     while (true) {
         const { done, value } = await reader.read();
@@ -149,6 +165,17 @@ export async function leerStreamOllama(reader, burbuja, acumulador) {
                 const token = data.response ?? '';
                 // Si el token no esta vacio
                 if (token !== '') {
+                    // Si es el primer token, ocultamos el indicador de escribiendo
+                    if (primerToken) {
+                        const escribiendoUi = document.getElementById('escribiendo-ui');
+                        if (escribiendoUi) escribiendoUi.style.display = 'none';
+                        const puntosDiv = document.querySelector('.puntos-escribiendo');
+                        // Si existe la burbuja de IA mostramos los puntos de escribiendo
+                        if (puntosDiv) {
+                            puntosDiv.innerHTML = '<span></span><span></span><span></span>';
+                        }
+                        primerToken = false;
+                    }
                     // Agrega el token al acumulador
                     acumulador.texto += token;
                     // Agrega el token a la burbuja
@@ -163,3 +190,50 @@ export async function leerStreamOllama(reader, burbuja, acumulador) {
         }
     }
 }
+
+
+window.toggleSelectorModelo = function () {
+    const dropdown = document.getElementById('dropdown-modelos');
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+}
+
+window.seleccionarModelo = function (valor, etiqueta) {
+    // Cerrar dropdown
+    document.getElementById('dropdown-modelos').style.display = 'none';
+
+    // Actualizar nombre visible
+    document.getElementById('modelo-nombre').textContent = etiqueta;
+
+    // Actualizar variable global
+    window.MODELO_ACTUAL = valor;
+
+    // Actualizar clase activo en opciones
+    document.querySelectorAll('.opcion-modelo').forEach(op => {
+        op.classList.remove('activo');
+        const check = op.querySelector('.opcion-check');
+        if (check) check.remove();
+    });
+    const opcionActiva = document.querySelector('[onclick*="' + valor + '"]');
+    if (opcionActiva) {
+        opcionActiva.classList.add('activo');
+    }
+
+    // Guardar en servidor
+    fetch('/conversaciones/' + window.ID_CONVERSACION + '/modelo', {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': window.TOKEN_CSRF,
+        },
+        body: JSON.stringify({ modelo: valor }),
+    });
+}
+
+// Cerrar dropdown al hacer click fuera
+document.addEventListener('click', function (e) {
+    const wrap = document.getElementById('selector-modelo-wrap');
+    const dropdown = document.getElementById('dropdown-modelos');
+    if (wrap && dropdown && !wrap.contains(e.target)) {
+        dropdown.style.display = 'none';
+    }
+});
