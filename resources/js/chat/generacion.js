@@ -47,6 +47,15 @@ window.detenerGeneracion = function () {
         window.controladorAborto.abort();
         console.log('Señal de aborto enviada con éxito.');
         window.controladorAborto = null;
+
+        // Liberar bloqueo en el servidor
+        fetch('/modelo/liberar-bloqueo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': window.TOKEN_CSRF,
+            }
+        }).catch(e => console.error('Error al liberar bloqueo:', e));
     } else {
         console.log('No hay generación activa para detener.');
     }
@@ -61,23 +70,53 @@ window.reanudarGeneracion = async function () {
 
     // Extrae los datos de la generación pausada
     const { promptOriginal, idMensajeIa, respuestaAcumulada, burbujaIa } = window.datosGeneracionPausada;
-    window.datosGeneracionPausada = null;
 
     // Oculta el botón de reanudar si existe
     const btnReanudar = document.getElementById('btn-reanudar');
     if (btnReanudar) btnReanudar.style.display = 'none';
 
     window.establecerCargando(true);
-    // Oculta el indicador de escribiendo porque ya existe la burbuja, a menos que el modelo se esté cargando
-    document.getElementById('escribiendo-ui').style.display = 'none';
-    window.generacionDetenida = false;
-
-    // Acumulador que empieza con lo que ya se tenía
-    let acumulador = { texto: respuestaAcumulada };
-
-    console.log('Reanudando generación. Texto acumulado: ' + respuestaAcumulada.length + ' caracteres.');
 
     try {
+        // Intentar adquirir el bloqueo en el servidor
+        const lockRes = await fetch('/modelo/adquirir-bloqueo', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': window.TOKEN_CSRF,
+            }
+        });
+
+        // Comprobar que se adquirió el bloqueo
+        if (!lockRes.ok) {
+            if (lockRes.status === 423) {
+                // El modelo está ocupado
+                const data = await lockRes.json();
+                window.mostrarNotificacion(data.message || 'El modelo está ocupado, por favor espere.', 'warning');
+            } else if (lockRes.status === 419) {
+                // La sesión ha expirado o se ha cambiado de cuenta en otra pestaña
+                window.mostrarNotificacion('La sesión ha expirado o se ha cambiado de cuenta en otra pestaña. Por favor, recarga la página.', 'error');
+            } else {
+                // Otro error
+                window.mostrarNotificacion('Error al reanudar la generación (código ' + lockRes.status + ').', 'error');
+            }
+            if (btnReanudar) btnReanudar.style.display = 'flex';
+            finalizarGeneracion();
+            return;
+        }
+
+        // Ya adquirimos el bloqueo, podemos quitar la referencia de datosGeneracionPausada
+        window.datosGeneracionPausada = null;
+
+        // Oculta el indicador de escribiendo porque ya existe la burbuja, a menos que el modelo se esté cargando
+        document.getElementById('escribiendo-ui').style.display = 'none';
+        window.generacionDetenida = false;
+
+        // Acumulador que empieza con lo que ya se tenía
+        let acumulador = { texto: respuestaAcumulada };
+
+        console.log('Reanudando generación. Texto acumulado: ' + respuestaAcumulada.length + ' caracteres.');
+
         window.controladorAborto = new AbortController();
 
         const modelName = window.MODELO_ACTUAL || 'mistral';
@@ -136,6 +175,14 @@ window.reanudarGeneracion = async function () {
             await guardarYPrepararReanudacion(idMensajeIa, acumulador.texto, promptOriginal, burbujaIa);
         } else {
             agregarMensaje('ia', 'Error de conexión: ' + err.message);
+            // Liberar bloqueo si es error de conexión
+            fetch('/modelo/liberar-bloqueo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.TOKEN_CSRF,
+                }
+            }).catch(e => console.error('Error al liberar bloqueo:', e));
         }
     } finally {
         finalizarGeneracion();
@@ -149,7 +196,7 @@ window.enviar = async function () {
     if (!content || window.enviando) return;
     input.value = '';
     input.style.height = 'auto';
-    agregarMensaje('usuario', content);
+
     window.establecerCargando(true);
     window.generacionDetenida = false;
 
@@ -176,8 +223,23 @@ window.enviar = async function () {
         });
 
         if (!res.ok) {
-            throw new Error('Error al guardar mensaje en el servidor (' + res.status + ')');
+            if (res.status === 423) {
+                // El modelo está ocupado
+                const data = await res.json();
+                window.mostrarNotificacion(data.message || 'El modelo está ocupado, por favor espere.', 'warning');
+            } else if (res.status === 419) {
+                // La sesión ha expirado o se ha cambiado de cuenta en otra pestaña
+                window.mostrarNotificacion('La sesión ha expirado o se ha cambiado de cuenta en otra pestaña. Por favor, recarga la página.', 'error');
+            } else {
+                window.mostrarNotificacion('Error al enviar el mensaje (código ' + res.status + ').', 'error');
+            }
+            input.value = content; // Restaurar texto
+            finalizarGeneracion();
+            return;
         }
+
+        // Si se guardó correctamente, agregamos el mensaje del usuario a la interfaz
+        agregarMensaje('usuario', content);
 
         // Obtenemos la respuesta de PHP con el prompt y el id del mensaje
         const datosServidor = await res.json();
@@ -286,6 +348,14 @@ window.enviar = async function () {
             await guardarYPrepararReanudacion(idMensajeIa, acumulador.texto, promptOriginal, burbujaIaRef);
         } else {
             agregarMensaje('ia', 'Error de conexión: ' + err.message);
+            // Liberar bloqueo si es error de conexión
+            fetch('/modelo/liberar-bloqueo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.TOKEN_CSRF,
+                }
+            }).catch(e => console.error('Error al liberar bloqueo:', e));
         }
     } finally {
         finalizarGeneracion();

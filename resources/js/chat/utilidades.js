@@ -237,3 +237,40 @@ document.addEventListener('click', function (e) {
         dropdown.style.display = 'none';
     }
 });
+
+// Sistema de notificaciones flotantes (toasts)
+window.mostrarNotificacion = function (mensaje, tipo = 'warning') {
+    let container = document.getElementById('pai-notification-container');
+    if (!container) {
+        // Crear contenedor de notificaciones
+        container = document.createElement('div');
+        container.id = 'pai-notification-container';
+        container.className = 'pai-toast-container';
+        document.body.appendChild(container);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `pai-toast pai-toast-${tipo}`;
+
+    // Mostrar icono según el tipo
+    let icon = '⚠️';
+    if (tipo === 'error') icon = '❌';
+    if (tipo === 'info') icon = 'ℹ️';
+
+    toast.innerHTML = `<span class="pai-toast-icon">${icon}</span><span>${mensaje}</span>`;
+    container.appendChild(toast);
+
+    // Mostrar toast
+    setTimeout(() => {
+        toast.classList.add('mostrar');
+    }, 10);
+
+    // Ocultar toast después de 5 segundos
+    setTimeout(() => {
+        toast.classList.remove('mostrar');
+        // Eliminar toast después de 0.4 segundos
+        setTimeout(() => {
+            toast.remove();
+        }, 400);
+    }, 5000);
+}
