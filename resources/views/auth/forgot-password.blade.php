@@ -1,15 +1,16 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('¿Olvidaste tu contraseña? No hay problema. Simplemente haznos saber tu dirección de correo electrónico y te enviaremos un enlace de restablecimiento de contraseña que te permitirá elegir una nueva.') }}
+    <div class="mb-4 text-sm"
+        style="font-family: sans-serif; color: var(--texto-atenuado); margin-bottom: 20px; line-height: 1.5;">
+        {{ __('¿Olvidaste tu contraseña? No hay problema. Introduce tu dirección de correo electrónico y, si hay conexión a internet, te enviaremos un enlace de restablecimiento de contraseña para que elijas una nueva.') }}
     </div>
 
-    <!-- Session Status -->
+    <!-- Mensaje de estado -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('password.email') }}">
         @csrf
 
-        <!-- Email Address -->
+        <!-- Email -->
         <div>
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required
@@ -19,7 +20,7 @@
 
         <div class="flex items-center justify-end mt-4">
             <x-primary-button>
-                {{ __('Enviar enlace de restablecimiento de contraseña') }}
+                {{ __('Enviar enlace de restablecimiento') }}
             </x-primary-button>
         </div>
     </form>

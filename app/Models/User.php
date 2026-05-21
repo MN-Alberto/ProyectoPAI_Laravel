@@ -47,6 +47,17 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Enviar la notificación de restablecimiento de contraseña.
+     * Sobreescribe el metodo de la clase Authenticatable para enviar la notificacion personalizada
+     * @param mixed $token 
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        // Enviamos la notificacion al usuario a traves del canal de correo electronico
+        $this->notify(new \App\Notifications\RestablecerPassword($token));
+    }
+
     // Definimos la relacion entre usuario y conversacion
     public function conversaciones(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

@@ -95,6 +95,9 @@ php artisan route:cache 2>/dev/null || true
 # Genera cache de route
 # Gestiona los errores y la continuacion del script igual que la generacion del cache de config
 
+# Corregir permisos de storage generados por comandos ejecutados como root
+chown -R www-data:www-data storage bootstrap/cache
+
 echo "Estamos ready :)"
 
 echo "Abrir http://localhost:8000 en el navegador"

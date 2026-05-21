@@ -43,6 +43,9 @@ services:
     image: ollama/ollama:latest
     container_name: pai_ollama
     restart: unless-stopped
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_KEEP_ALIVE=15m
     volumes:
       - ./ollama_data:/root/.ollama
     ports:

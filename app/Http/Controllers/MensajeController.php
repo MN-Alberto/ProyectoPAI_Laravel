@@ -4,28 +4,101 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Mensaje;
 use App\Models\Conversacion;
 
 class MensajeController extends Controller
 {
+    // Modelos disponibles
+    const MODELOS = [
+        'chat' => 'mistral',
+        'rapido' => 'phi3',
+        'codigo' => 'deepseek-coder',
+        'ligero' => 'tinyllama',
+    ];
+
+    /**
+     * Intentar adquirir un bloqueo global de generación
+     */
+    private function intentarAdquirirBloqueo($userId)
+    {
+        $lock = Cache::get('ollama_generation_lock');
+
+        if ($lock) {
+            // Si el bloqueo sigue activo temporalmente
+            if (now()->timestamp < $lock['expires_at']) {
+                // Si pertenece a otro usuario, no se puede adquirir
+                if ($lock['user_id'] !== $userId) {
+                    return false;
+                }
+            }
+        }
+
+        // Adquirir bloqueo por 90 segundos
+        Cache::put('ollama_generation_lock', [
+            'user_id' => $userId,
+            'expires_at' => now()->addSeconds(90)->timestamp
+        ], 90);
+
+        return true;
+    }
+
+    /**
+     * Liberar el bloqueo global de generación
+     */
+    private function liberarBloqueoGlobal()
+    {
+        Cache::forget('ollama_generation_lock');
+    }
+
+    public function adquirirBloqueo(Request $request)
+    {
+        // Intentar adquirir bloqueo
+        $adquirido = $this->intentarAdquirirBloqueo(auth()->id());
+        // Si no se puede adquirir el bloqueo devuelve un error
+        if (!$adquirido) {
+            return response()->json([
+                'error' => 'busy',
+                'message' => 'El servicio está ocupado procesando otra solicitud. Por favor, espere.'
+            ], 423);
+        }
+        return response()->json(['ok' => true]);
+    }
+
+    public function liberarBloqueo(Request $request)
+    {
+        //  Libera el bloqueo global
+        $this->liberarBloqueoGlobal();
+        return response()->json(['ok' => true]);
+    }
+
     public function store(Request $request, Conversacion $conversacion)
     {
         // Verifica que el usuario tenga permiso para acceder a la conversacion
         Gate::authorize('view', $conversacion);
+
+        // Intentar adquirir bloqueo antes de crear el mensaje
+        if (!$this->intentarAdquirirBloqueo(auth()->id())) {
+            return response()->json([
+                'error' => 'busy',
+                'message' => 'El servicio está ocupado procesando otra solicitud. Por favor, espere.'
+            ], 423);
+        }
+
         // Valida que el contenido del mensaje sea correcto
         $request->validate(['content' => 'required|string|max:10000']);
 
         // Crea el mensaje en la base de datos
         $conversacion->mensajes()->create([
             'rol' => 'usuario',
-            'contenido' => $request->content,
+            'contenido' => $request->input('content'),
         ]);
 
         // Si es el primer mensaje se actualiza el titulo de la conversacion
         if ($conversacion->mensajes()->count() === 1) {
             $conversacion->update([
-                'tituloConversacion' => mb_substr($request->content, 0, 60),
+                'tituloConversacion' => mb_substr($request->input('content'), 0, 60),
             ]);
         }
 
@@ -37,12 +110,14 @@ class MensajeController extends Controller
         // Crea el mensaje de respuesta en la base de datos
         $mensajeRespuesta = $conversacion->mensajes()->create([
             'rol' => 'ia',
-            'contenido' => ''
+            'contenido' => '',
+            'modelo' => $conversacion->modelo,
         ]);
-        // Devuelve el prompt y el id del mensaje de respuesta
+        // Devuelve el prompt, el id del mensaje de respuesta y el modelo
         return response()->json([
             'prompt' => $prompt,
             'mensaje_id' => $mensajeRespuesta->id,
+            'modelo' => $conversacion->modelo,
         ]);
     }
 
@@ -54,13 +129,31 @@ class MensajeController extends Controller
         $request->validate(['contenido' => 'required|string']);
         // Actualiza el contenido del mensaje
         $mensaje->update(['contenido' => $request->contenido]);
+
+        // Liberar el bloqueo global
+        $this->liberarBloqueoGlobal();
+
         // Devuelve que todo ha ido bien
         return response()->json(['ok' => true]);
     }
 
+    public function cambiarModelo(Request $request, Conversacion $conversacion)
+    {
+        // Verifica que el usuario tenga permiso para acceder a la conversacion
+        Gate::authorize('view', $conversacion);
+        // Valida que el modelo sea correcto
+        $request->validate([
+            'modelo' => 'required|string|in:' . implode(',', self::MODELOS),
+        ]);
+        // Actualiza el modelo
+        $conversacion->update(['modelo' => $request->modelo]);
+        // Devuelve que todo ha ido bien y el modelo
+        return response()->json(['ok' => true, 'modelo' => $request->modelo]);
+    }
+
     private function generarPrompt($mensajes): string
     {
-        // Genera el prompt para la ia
+        // Genera el prompt para que la ia no se vuelva loca y traduzca la respuesta al ingles o otro idioma
         $prompt = "<s>[INST] <<SYS>>\nYou are a helpful assistant. Always respond in the same language the user uses. If the user writes in Spanish, respond in Spanish only. If the user writes in English, respond in English only. Never mix languages or add translations in parentheses.\n<</SYS>>\n\n";
 
         // Variable para saber si es el primer mensaje

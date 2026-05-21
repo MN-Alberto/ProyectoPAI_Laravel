@@ -57,8 +57,16 @@ class ConversacionController extends Controller
         // Obtiene todos los mensajes de la conversación ordenados por fecha
         $mensajes = $conversacion->mensajes()->orderBy('created_at')->get();
 
+        // Array con los modelos disponibles
+        $modelosDisponibles = [
+            'mistral' => 'Mistral 7B',
+            'phi3' => 'Phi-3 Mini',
+            'deepseek-coder' => 'DeepSeek Coder',
+            'tinyllama' => 'TinyLlama'
+        ];
+
         // Muestra la conversación
-        return view('conversaciones.show', compact('conversacion', 'conversaciones', 'mensajes'));
+        return view('conversaciones.show', compact('conversacion', 'conversaciones', 'mensajes', 'modelosDisponibles'));
     }
 
     // Eliminar una conversación

@@ -30,16 +30,36 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
+        // Si no hay conexión a internet no se puede enviar el correo
+        if (!$this->hasInternetConnection()) {
+            return back()->withInput($request->only('email'))
+                ->withErrors(['email' => __('No hay conexión a internet. No se puede recuperar la contraseña.')]);
+        }
+
+        // Enviamos el enlace de restablecimiento de contraseña
         $status = Password::sendResetLink(
             $request->only('email')
         );
 
+        // Comprobamos si se ha enviado el enlace de restablecimiento de contraseña
         return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+            ? back()->with('status', __($status))
+            : back()->withInput($request->only('email'))
+                ->withErrors(['email' => __($status)]);
+    }
+
+    /**
+     * Comprobamos que hay una conexión a internet activa
+     */
+    private function hasInternetConnection(): bool
+    {
+        // Abrimos una conexión al servidor de google
+        $connected = @fsockopen("www.google.com", 80, $errno, $errstr, 2);
+        // Si hay conexión devolvemos true
+        if ($connected) {
+            fclose($connected);
+            return true;
+        }
+        return false;
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 //Ruta por defecto al entrar a la aplicación
 Route::get('/', function () {
-    return redirect()->route('conversaciones.index');
+    return view('welcome');
 });
 
 //Rutas para el perfil del usuario
@@ -20,6 +20,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile/actualizar-usuario', [ProfileController::class, 'actualizarUsuario'])->name('profile.actualizar-usuario');
     //Rutas para eliminar el perfil del usuario
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    //Rutas para cambiar el modelo
+    Route::patch('/conversaciones/{conversacion}/modelo', [MensajeController::class, 'cambiarModelo'])->name('conversaciones.modelo');
 });
 
 //Rutas para las conversaciones
@@ -36,6 +38,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/conversaciones/{conversacion}/mensajes', [MensajeController::class, 'store'])->name('mensajes.store');
     //Rutas para guardar la respuesta de la ia en la base de datos
     Route::post('/conversaciones/{conversacion}/mensajes/{mensaje}/guardar', [MensajeController::class, 'guardarRespuesta']);
+    //Rutas para el bloqueo del modelo
+    Route::post('/modelo/adquirir-bloqueo', [MensajeController::class, 'adquirirBloqueo'])->name('modelo.adquirir-bloqueo');
+    Route::post('/modelo/liberar-bloqueo', [MensajeController::class, 'liberarBloqueo'])->name('modelo.liberar-bloqueo');
 });
 
 //Rutas para la autenticación

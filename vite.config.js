@@ -8,7 +8,11 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/css/chat.css',
-                'resources/js/chat.js'
+                'resources/js/chat.js',
+                'resources/css/welcome.css',
+                'resources/css/auth/login.css',
+                'resources/css/auth/register.css',
+                'resources/css/auth/forgot-password.css'
             ],
             refresh: true,
         }),
