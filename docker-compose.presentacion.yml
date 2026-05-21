@@ -25,6 +25,7 @@ services:
     image: mysql:8.0               # imagen precargada desde el USB
     container_name: pai_mysql
     restart: unless-stopped
+    command: --default-authentication-plugin=mysql_native_password # Forzamos el plugin de autenticación para que funcione con Laravel, si no da error con sha256_password
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: pai
@@ -42,6 +43,9 @@ services:
     image: ollama/ollama:latest    # imagen precargada desde el USB
     container_name: pai_ollama
     restart: unless-stopped
+    environment:
+      - OLLAMA_MAX_LOADED_MODELS=2
+      - OLLAMA_KEEP_ALIVE=15m
     volumes:
       - ./ollama_data:/root/.ollama
     ports:
