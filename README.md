@@ -15,7 +15,7 @@ El objetivo del proyecto es simular un sistema SaaS moderno de chat con IA, incl
 - Implementar un sistema de chat tipo ChatGPT
 - Soportar múltiples usuarios con autenticación
 - Gestionar conversaciones persistentes
-- Integrar un modelo de IA local
+- Integrar uno o varios modelos de IA en local
 - Implementar respuestas en streaming (tiempo real)
 - Ejecutar todo el sistema completamente offline
 - Ejecutar todo el sistema en entorno portable mediante Docker
@@ -30,7 +30,7 @@ Backend (Laravel API)
         ->
 Servicios internos (Chat + IA)
         ->
-Modelo de IA local (Ollama + Mistral)
+Modelos de IA local (Ollama)
         ->
 Base de datos (MySQL)
 
@@ -54,7 +54,7 @@ Base de datos (MySQL)
 
 ### Inteligencia Artificial
 - Ollama (motor de inferencia local)
-- Modelo LLM local: Mistral
+- Modelos LLM locales: Mistral, Phi-3 Mini, DeepSeek Coder, TinyLlama
 - Inferencia completamente offline
 
 ### Infraestructura
@@ -75,17 +75,19 @@ Todas las operaciones se ejecutan localmente:
 
 - Backend Laravel local
 - Base de datos MySQL local
-- Modelo de IA almacenado localmente
+- Modelos de IA almacenados localmente
 - Generación de respuestas sin APIs externas
 - Comunicación interna mediante Docker Network
 
-El modelo de IA se ejecuta mediante Ollama utilizando un volumen persistente Docker para evitar pérdida del modelo entre reinicios o apagados del sistema.
+Los modelos de IA se ejecutan mediante Ollama utilizando un volumen persistente Docker para evitar pérdida del modelo entre reinicios o apagados del sistema.
+Se cargarán en memoria un máximo de 2 modelos a la vez. En caso de necesitar otro, Ollama utiliza una política llamada LRU (Last Recently Used), que significa que eliminará el modelo que menos se haya utilizado para liberar memoria y dejar espacio para el nuevo modelo.
 
 ---
 
 ## Inteligencia artificial
 
-El sistema utiliza **Ollama** como motor local, ejecutando el modelo **Mistral** dentro de un contenedor Docker.
+El sistema utiliza **Ollama** como motor local, ejecutando varios modelos dentro de un contenedor Docker.
+Los modelos actuales son: Mistral, Phi-3 Mini, DeepSeek Coder, TinyLlama.
 
 Esto permite:
 
@@ -110,6 +112,7 @@ Http::post('http://ollama:11434/api/generate')
 - Registro e inicio de sesión de usuarios
 - Sistema de conversaciones persistentes
 - Chat con IA tipo ChatGPT
+- Multi-modelo: selección del modelo a utilizar en cada mensaje individual
 - Streaming de respuestas en tiempo real
 - Historial completo de mensajes
 - Regeneración de respuestas
@@ -151,7 +154,7 @@ http://localhost:8000
 
 ## Persistencia del modelo de IA
 
-El modelo Mistral se almacena en un volumen Docker persistente:
+Los modelos se almacenan en un volumen Docker persistente:
 
 ```yaml
 volumes:
@@ -160,7 +163,7 @@ volumes:
 
 Esto permite:
 
-- Mantener el modelo aunque el contenedor se elimine
+- Mantener los modelos aunque el contenedor se elimine
 - Portabilidad entre ordenadores
 - Persistencia tras reinicios
 - Ejecución offline estable
@@ -169,13 +172,12 @@ Esto permite:
 
 ## Flujo de generación de respuesta
 
-1. El usuario envía un mensaje
-2. Laravel guarda el mensaje en MySQL
-3. Se construye el contexto de conversación
-4. Laravel envía el prompt a Ollama
-5. Ollama genera la respuesta token a token
-6. El frontend recibe el stream en tiempo real
-7. La respuesta se almacena en la base de datos
+1. El usuario envía un mensaje seleccionando el modelo a utilizar
+2. Laravel guarda el mensaje en MySQL y construye el contexto de conversación con el modelo seleccionado
+3. Laravel envía el prompt a Ollama con el modelo seleccionado
+4. Ollama genera la respuesta token a token con el modelo seleccionado
+5. El frontend recibe el stream en tiempo real
+6. La respuesta se almacena en la base de datos
 
 ---
 
@@ -196,8 +198,8 @@ Esto permite:
 
 - Windows 10/11
 - Docker Desktop
-- 8GB RAM recomendados
-- Espacio libre suficiente para modelos LLM
+- 16GB RAM recomendados
+- Espacio libre suficiente para modelos LLM (~20GB)
 
 ### Requisitos opcionales
 
@@ -235,9 +237,7 @@ Esto permite continuar el desarrollo o realizar presentaciones sin necesidad de 
 
 - Memoria a largo plazo
 - Sistema de roles (admin/user)
-- Streaming mediante WebSockets
 - Interfaz avanzada React/Vue
-- Soporte multi-modelo
 - Integración RAG local
 - Base vectorial local
 - GPU acceleration
