@@ -21,6 +21,9 @@
     --texto-tenue: #3a3a55;
     --radio: 14px;
     --ancho-barra-lateral: 312px;
+
+    --fuente-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --fuente-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 body.light {
@@ -45,7 +48,7 @@ body {
 }
 
 body {
-    font-family: 'Georgia', serif;
+    font-family: var(--fuente-sans);
     background: var(--fondo-oscuro);
     color: var(--texto-principal);
     display: flex;

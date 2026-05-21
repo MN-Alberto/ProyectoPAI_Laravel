@@ -71,7 +71,7 @@ main {
     color: var(--texto-atenuado);
     max-width: 280px;
     line-height: 1.6;
-    font-family: sans-serif;
+    font-family: var(--fuente-sans);
 }
 
 .msg-usuario {
@@ -90,7 +90,7 @@ main {
     line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
-    font-family: sans-serif;
+    font-family: var(--fuente-sans);
     box-shadow: 0 2px 12px rgba(124, 106, 255, 0.25);
 }
 
@@ -152,13 +152,13 @@ main {
     line-height: 1.6;
     white-space: pre-wrap;
     word-break: break-word;
-    font-family: sans-serif;
+    font-family: var(--fuente-sans);
     transition: background 0.3s, border-color 0.3s;
 }
 
 .modelo-nombre-tag {
     font-size: 10px;
-    font-family: monospace;
+    font-family: var(--fuente-mono);
     color: var(--texto-atenuado);
     margin-left: 6px;
     margin-bottom: 5px;
@@ -260,7 +260,7 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-family: sans-serif;
+    font-family: var(--fuente-sans);
 }
 
 .pai-toast.mostrar {
