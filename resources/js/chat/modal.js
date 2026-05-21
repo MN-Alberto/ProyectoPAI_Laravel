@@ -72,4 +72,49 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Modal de eliminación de conversación
+    const modalEliminar = document.getElementById('modal-eliminar');
+    const btnCerrarEliminar = document.getElementById('btn-cerrar-modal-eliminar');
+    const btnCancelarEliminar = document.getElementById('btn-cancelar-modal-eliminar');
+    const btnConfirmarEliminar = document.getElementById('btn-confirmar-eliminar');
+    let formularioAEliminar = null;
+
+    // Si la lista de conversaciones y el modal existen se agrega un evento de click a la lista de conversaciones
+    const listaConv = document.querySelector('.lista-conv');
+    if (listaConv && modalEliminar) {
+        listaConv.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-abrir-eliminar');
+            if (btn) {
+                e.preventDefault();
+                e.stopPropagation();
+                formularioAEliminar = btn.closest('form');
+                modalEliminar.style.display = 'flex';
+            }
+        });
+    }
+
+    function cerrarModalEliminar() {
+        if (modalEliminar) {
+            modalEliminar.style.display = 'none';
+            formularioAEliminar = null;
+        }
+    }
+
+    if (modalEliminar) {
+        if (btnCerrarEliminar) btnCerrarEliminar.addEventListener('click', cerrarModalEliminar);
+        if (btnCancelarEliminar) btnCancelarEliminar.addEventListener('click', cerrarModalEliminar);
+        if (btnConfirmarEliminar) {
+            btnConfirmarEliminar.addEventListener('click', function () {
+                if (formularioAEliminar) {
+                    formularioAEliminar.submit();
+                }
+            });
+        }
+        modalEliminar.addEventListener('click', function (e) {
+            if (e.target === modalEliminar) {
+                cerrarModalEliminar();
+            }
+        });
+    }
 });
