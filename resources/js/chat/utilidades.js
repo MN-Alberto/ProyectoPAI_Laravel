@@ -21,19 +21,40 @@ window.manejarTecla = function (e) {
     }
 }
 
-// Alterna entre modo claro y oscuro
-window.alternarTema = function () {
-    const esClaro = document.body.classList.toggle('light');
-    // Guarda el tema en localStorage
-    localStorage.setItem('pai-theme', esClaro ? 'light' : 'dark');
+// Aplica el tema claro o oscuro en la interfaz y actualiza los iconos
+window.aplicarTema = function (tema) {
+    const esClaro = tema !== 'dark';
+    if (esClaro) {
+        document.body.classList.add('light');
+    } else {
+        document.body.classList.remove('light');
+    }
 
+    // Alterna los iconos del sol y la luna según el tema
     const sun = document.getElementById('icono-sol');
     const moon = document.getElementById('icono-luna');
-    // Si el sol y la luna existen cambia el icono
     if (sun && moon) {
         sun.style.display = esClaro ? 'none' : 'block';
         moon.style.display = esClaro ? 'block' : 'none';
     }
+}
+
+// Inicializa el tema desde localStorage
+window.inicializarTema = function () {
+    // Si no existe el tema en localStorage se establece el tema oscuro como predeterminado
+    const temaGuardado = localStorage.getItem('pai-theme') || 'dark';
+    window.aplicarTema(temaGuardado);
+}
+
+// Alterna entre modo claro y oscuro
+window.alternarTema = function () {
+    // Determina si el tema actual es claro u oscuro
+    const esClaro = !document.body.classList.contains('light');
+    const nuevoTema = esClaro ? 'light' : 'dark';
+    // Guarda el tema en localStorage
+    localStorage.setItem('pai-theme', nuevoTema);
+    // Aplica el tema
+    window.aplicarTema(nuevoTema);
 }
 
 // Escapa caracteres HTML especiales para evitar inyección XSS
