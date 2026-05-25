@@ -18,7 +18,7 @@
             @if(file_exists(public_path('images/logoPAI.png')))
                 <img src="{{ $message->embed(public_path('images/logoPAI.png')) }}" alt="PAI Logo">
             @endif
-            <div class="header-title">PAI - Inteligencia Artificial</div>
+            <div class="header-title">PAI - Personal AI</div>
         </div>
         <div class="content">
             <h1>Hola, {{ $user->name }}</h1>
