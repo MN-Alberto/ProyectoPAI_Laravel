@@ -1,19 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Restaurar tema guardado
-    const temaGuardado = localStorage.getItem('pai-theme');
-    // Variable que almacena el icono del sol
-    const sun = document.getElementById('icono-sol');
-    // Variable que almacena el icono de la luna
-    const moon = document.getElementById('icono-luna');
-
-    if (temaGuardado === 'dark') {
-        document.body.classList.remove('light');
-        if (sun) sun.style.display = 'block';
-        if (moon) moon.style.display = 'none';
-    } else {
-        document.body.classList.add('light');
-        if (sun) sun.style.display = 'none';
-        if (moon) moon.style.display = 'block';
+    // Inicializa el tema guardado
+    if (window.inicializarTema) {
+        window.inicializarTema();
     }
 
     // Desplaza la ventana hacia abajo al iniciar
