@@ -105,4 +105,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // RESPONSIVE: Logica del boton de menú móvil
+    const btnMenuMovil = document.getElementById('btn-menu-movil');
+    const barraLateral = document.querySelector('.barra-lateral');
+    const capaOscuraLateral = document.getElementById('capa-oscura-lateral');
+
+    if (btnMenuMovil && barraLateral && capaOscuraLateral) {
+        function toggleSidebar() {
+            barraLateral.classList.toggle('abierta');
+            capaOscuraLateral.classList.toggle('visible');
+        }
+
+        function closeSidebar() {
+            barraLateral.classList.remove('abierta');
+            capaOscuraLateral.classList.remove('visible');
+        }
+
+        btnMenuMovil.addEventListener('click', toggleSidebar);
+        capaOscuraLateral.addEventListener('click', closeSidebar);
+
+        // Cierra el sidebar si se hace click en una conversación en móvil
+        const itemsConv = document.querySelectorAll('.item-conv');
+        itemsConv.forEach(item => {
+            item.addEventListener('click', closeSidebar);
+        });
+    }
 });
