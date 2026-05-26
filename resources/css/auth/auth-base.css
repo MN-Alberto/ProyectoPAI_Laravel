@@ -237,3 +237,64 @@ body {
     background: rgba(124, 106, 255, 0.08) !important;
     transform: translateX(-2px);
 }
+
+/* RESPONSIVE */
+
+@media (max-width: 480px) {
+    .contenedor-auth {
+        padding: 16px;
+    }
+
+    .tarjeta-auth {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+
+    .logo-auth {
+        margin-bottom: 24px;
+    }
+
+    .logo-auth img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .texto-logo-auth {
+        font-size: 24px;
+    }
+
+    .tarjeta-auth input[type="text"],
+    .tarjeta-auth input[type="email"],
+    .tarjeta-auth input[type="password"] {
+        padding: 11px 12px !important;
+        font-size: 13px !important;
+        border-radius: 10px !important;
+    }
+
+    .tarjeta-auth label {
+        font-size: 12px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .tarjeta-auth button[type="submit"] {
+        padding: 11px 20px !important;
+        font-size: 13.5px !important;
+        border-radius: 10px !important;
+        margin-top: 24px !important;
+    }
+
+    .tarjeta-auth .flex.items-center.justify-end {
+        flex-direction: column-reverse !important;
+        gap: 16px !important;
+        align-items: stretch !important;
+    }
+
+    .tarjeta-auth .flex.items-center.justify-end button {
+        width: 100% !important;
+    }
+
+    .tarjeta-auth .flex.items-center.justify-end .underline {
+        text-align: center !important;
+        display: block !important;
+    }
+}
