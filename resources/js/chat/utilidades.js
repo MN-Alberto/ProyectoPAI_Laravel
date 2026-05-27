@@ -99,6 +99,20 @@ window.establecerCargando = function (state) {
 
 // Agrega un mensaje al chat
 export function agregarMensaje(rol, contenido) {
+    // Actualizar la fecha/hora de la última actividad reactivamente en la barra lateral sin recargar
+    const activeFecha = document.querySelector('.item-conv.active .fecha-conv') || document.querySelector('.item-conv.activo .fecha-conv');
+    // Si la fecha existe actualiza la fecha/hora de la última actividad
+    if (activeFecha) {
+        const ahora = new Date();
+        const dia = String(ahora.getDate()).padStart(2, '0');
+        const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+        const anio = ahora.getFullYear();
+        const horas = String(ahora.getHours()).padStart(2, '0');
+        const minutos = String(ahora.getMinutes()).padStart(2, '0');
+        // Asigna la fecha/hora de la última actividad
+        activeFecha.textContent = `${dia}/${mes}/${anio} ${horas}:${minutos}`;
+    }
+
     const container = document.getElementById('contenedor-mensajes');
     const empty = container.querySelector('.estado-vacio');
     if (empty) {

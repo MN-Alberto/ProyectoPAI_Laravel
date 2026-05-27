@@ -10,7 +10,7 @@ class ConversacionController extends Controller
 {
     public function index()
     {
-        $conversaciones = auth()->user()->conversaciones()->latest()->get(); // Obtiene las conversaciones del usuario ordenadas por fecha
+        $conversaciones = auth()->user()->conversaciones()->withMax('mensajes', 'created_at')->latest()->get(); // Obtiene las conversaciones del usuario ordenadas por fecha
 
         // Si el usuario no tiene conversaciones, crea una nueva llamada "Nuevo chat" y redirige a ella
         if ($conversaciones->isEmpty()) {
@@ -53,7 +53,7 @@ class ConversacionController extends Controller
         Gate::authorize('view', $conversacion);
 
         // Obtiene todas las conversaciones del usuario ordenadas por fecha
-        $conversaciones = auth()->user()->conversaciones()->latest()->get();
+        $conversaciones = auth()->user()->conversaciones()->withMax('mensajes', 'created_at')->latest()->get(); // Se agrega el withMax para obtener la fecha del ultimo mensaje
         // Obtiene todos los mensajes de la conversación ordenados por fecha
         $mensajes = $conversacion->mensajes()->orderBy('created_at')->get();
 

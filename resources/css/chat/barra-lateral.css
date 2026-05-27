@@ -170,14 +170,28 @@
     font-family: var(--fuente-sans);
 }
 
+.info-conv {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
 .titulo-conv {
     font-size: 13px;
     color: var(--texto-atenuado);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex: 1;
     text-decoration: none;
+}
+
+.fecha-conv {
+    font-size: 10px;
+    color: var(--texto-tenue);
+    margin-top: 2px;
+    font-family: var(--fuente-mono);
+    opacity: 0.85;
 }
 
 .eliminar-conv {
