@@ -111,6 +111,13 @@ body {
     display: block !important;
 }
 
+.tarjeta-auth label.inline-flex {
+    display: inline-flex !important;
+    align-items: center !important;
+    margin-bottom: 0 !important;
+    cursor: pointer !important;
+}
+
 .tarjeta-auth button[type="submit"] {
     background: var(--acento) !important;
     color: white !important;
@@ -156,17 +163,33 @@ body {
 }
 
 .tarjeta-auth input[type="checkbox"] {
+    -webkit-appearance: none !important;
+    appearance: none !important;
     background-color: var(--fondo-entrada) !important;
-    border-color: var(--borde) !important;
+    border: 1px solid var(--borde) !important;
     border-radius: 6px !important;
     width: 18px !important;
     height: 18px !important;
-    color: var(--acento) !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    position: relative !important;
+    vertical-align: middle !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: 11px 11px !important;
+    transition: all 0.2s !important;
+}
+
+.tarjeta-auth input[type="checkbox"]:checked {
+    background-color: var(--acento) !important;
+    border-color: var(--acento) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") !important;
 }
 
 .tarjeta-auth input[type="checkbox"]:focus {
-    --tw-ring-color: var(--acento) !important;
-    --tw-ring-opacity: 0.3 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(124, 106, 255, 0.25) !important;
+    border-color: var(--acento) !important;
 }
 
 .tarjeta-auth .text-gray-600 {
@@ -213,4 +236,65 @@ body {
     border-color: var(--acento) !important;
     background: rgba(124, 106, 255, 0.08) !important;
     transform: translateX(-2px);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 480px) {
+    .contenedor-auth {
+        padding: 16px;
+    }
+
+    .tarjeta-auth {
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+
+    .logo-auth {
+        margin-bottom: 24px;
+    }
+
+    .logo-auth img {
+        width: 48px;
+        height: 48px;
+    }
+
+    .texto-logo-auth {
+        font-size: 24px;
+    }
+
+    .tarjeta-auth input[type="text"],
+    .tarjeta-auth input[type="email"],
+    .tarjeta-auth input[type="password"] {
+        padding: 11px 12px !important;
+        font-size: 13px !important;
+        border-radius: 10px !important;
+    }
+
+    .tarjeta-auth label {
+        font-size: 12px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .tarjeta-auth button[type="submit"] {
+        padding: 11px 20px !important;
+        font-size: 13.5px !important;
+        border-radius: 10px !important;
+        margin-top: 24px !important;
+    }
+
+    .tarjeta-auth .flex.items-center.justify-end {
+        flex-direction: column-reverse !important;
+        gap: 16px !important;
+        align-items: stretch !important;
+    }
+
+    .tarjeta-auth .flex.items-center.justify-end button {
+        width: 100% !important;
+    }
+
+    .tarjeta-auth .flex.items-center.justify-end .underline {
+        text-align: center !important;
+        display: block !important;
+    }
 }

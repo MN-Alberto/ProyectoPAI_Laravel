@@ -12,6 +12,9 @@
 
 <body class="light">
 
+    <!-- Capa oscura para cerrar barra lateral en móvil -->
+    <div id="capa-oscura-lateral" class="capa-oscura-lateral"></div>
+
     <aside class="barra-lateral">
         <div class="barra-lateral-cabecera">
             <div class="logo">
@@ -132,6 +135,15 @@
     </aside>
 
     <main>
+        <!-- Botón menú hamburguesa en móvil -->
+        <button type="button" id="btn-menu-movil" class="btn-menu-movil" title="Abrir menú">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
         <!--
         Contenido principal con la conversación actual
         -->

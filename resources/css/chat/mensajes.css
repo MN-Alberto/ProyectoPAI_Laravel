@@ -284,3 +284,67 @@ main {
 .pai-toast-info {
     border-left-color: #54a0ff;
 }
+
+/* RESPONSIVE */
+
+/* Tablet y móvil */
+@media (max-width: 1024px) {
+    #contenedor-mensajes {
+        padding: 64px 0 24px;
+        /* Espacio para el boton de menu movil fijo en la parte superior */
+    }
+
+    .burbuja-msg-usuario,
+    .envoltura-burbuja-ia {
+        max-width: 80%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .msg-usuario,
+    .msg-ia,
+    .indicador-escribiendo,
+    .estado-vacio {
+        padding: 0 16px;
+    }
+
+    .burbuja-msg-usuario,
+    .envoltura-burbuja-ia {
+        max-width: 85%;
+    }
+
+    .burbuja-msg-usuario,
+    .burbuja-msg-ia {
+        padding: 10px 14px;
+        font-size: 13.5px;
+    }
+
+    .avatar-msg-ia {
+        width: 28px;
+        height: 28px;
+    }
+
+    .titulo-vacio {
+        font-size: 16px;
+    }
+
+    .sub-vacio {
+        font-size: 12px;
+        max-width: 240px;
+    }
+
+    .pai-toast-container {
+        top: 12px;
+        right: 12px;
+        left: 12px;
+        width: calc(100% - 24px);
+    }
+
+    .pai-toast {
+        min-width: 0;
+        max-width: 100%;
+        font-size: 12.5px;
+        padding: 10px 16px;
+    }
+}
