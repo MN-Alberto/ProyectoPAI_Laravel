@@ -25,7 +25,10 @@
             @if ($mensaje->rol === 'usuario')
                 <div class="msg-usuario">
                     <!--Si el mensaje es del usuario se muestra como un mensaje de usuario-->
-                    <div class="burbuja-msg-usuario">{{ $mensaje->contenido }}</div>
+                    <div class="envoltura-burbuja-usuario">
+                        <div class="burbuja-msg-usuario">{{ $mensaje->contenido }}</div>
+                        <span class="hora-mensaje">{{ $mensaje->created_at->setTimezone('Europe/Madrid')->format('H:i') }}</span>
+                    </div>
                 </div>
             @else
                 <div class="msg-ia">
@@ -40,6 +43,7 @@
                             </div>
                         @endif
                         <div class="burbuja-msg-ia">{{ $mensaje->contenido }}</div>
+                        <span class="hora-mensaje">{{ $mensaje->created_at->setTimezone('Europe/Madrid')->format('H:i') }}</span>
                     </div>
                 </div>
             @endif
