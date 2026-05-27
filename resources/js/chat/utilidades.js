@@ -141,9 +141,16 @@ export function agregarMensaje(rol, contenido) {
 
     const typing = document.getElementById('escribiendo-ui');
     const div = document.createElement('div');
+    
+    // Obtener la hora actual en formato local HH:mm
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const horaFormateada = `${horas}:${minutos}`;
+
     if (rol === 'usuario') {
         div.className = 'msg-usuario';
-        div.innerHTML = '<div class="burbuja-msg-usuario">' + escaparHtml(contenido) + '</div>';
+        div.innerHTML = '<div class="envoltura-burbuja-usuario"><div class="burbuja-msg-usuario">' + escaparHtml(contenido) + '</div><span class="hora-mensaje">' + horaFormateada + '</span></div>';
     } else {
         div.className = 'msg-ia';
         const nombresModelos = {
@@ -154,7 +161,7 @@ export function agregarMensaje(rol, contenido) {
         };
         const modelKey = window.MODELO_ACTUAL || 'mistral';
         const modelLabel = nombresModelos[modelKey] || modelKey;
-        div.innerHTML = '<div class="avatar-msg-ia"><img src="/images/logoPAI.png" alt="PAI"></div><div class="envoltura-burbuja-ia"><div class="modelo-nombre-tag">' + modelLabel + '</div><div class="burbuja-msg-ia">' + escaparHtml(contenido) + '</div></div>';
+        div.innerHTML = '<div class="avatar-msg-ia"><img src="/images/logoPAI.png" alt="PAI"></div><div class="envoltura-burbuja-ia"><div class="modelo-nombre-tag">' + modelLabel + '</div><div class="burbuja-msg-ia">' + escaparHtml(contenido) + '</div><span class="hora-mensaje">' + horaFormateada + '</span></div>';
     }
     // Inserta el mensaje en el contenedor
     container.insertBefore(div, typing);
