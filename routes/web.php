@@ -3,6 +3,7 @@
 use App\Http\Controllers\ConversacionController;
 use App\Http\Controllers\MensajeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 //Ruta por defecto al entrar a la aplicación
@@ -11,7 +12,7 @@ Route::get('/', function () {
 });
 
 //Rutas para el perfil del usuario
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'redirect_admin'])->group(function () {
     //Rutas para el perfil del usuario
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     //Rutas para actualizar el perfil del usuario
@@ -25,7 +26,7 @@ Route::middleware('auth')->group(function () {
 });
 
 //Rutas para las conversaciones
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'redirect_admin'])->group(function () {
     //Rutas para las conversaciones
     Route::get('/conversaciones', [ConversacionController::class, 'index'])->name('conversaciones.index');
     //Rutas para guardar las conversaciones
@@ -41,6 +42,22 @@ Route::middleware('auth')->group(function () {
     //Rutas para el bloqueo del modelo
     Route::post('/modelo/adquirir-bloqueo', [MensajeController::class, 'adquirirBloqueo'])->name('modelo.adquirir-bloqueo');
     Route::post('/modelo/liberar-bloqueo', [MensajeController::class, 'liberarBloqueo'])->name('modelo.liberar-bloqueo');
+});
+
+//Rutas para la administración
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    //Panel de administración
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    //Actualizar modelos permitidos de un usuario
+    Route::patch('/usuarios/{user}/modelos', [AdminController::class, 'actualizarModelos'])->name('admin.modelos');
+    //Actualizar datos de un usuario
+    Route::patch('/usuarios/{user}', [AdminController::class, 'actualizarUsuario'])->name('admin.actualizar-usuario');
+    //Crear un usuario
+    Route::post('/usuarios', [AdminController::class, 'crearUsuario'])->name('admin.crear-usuario');
+    //Eliminar un usuario
+    Route::delete('/usuarios/{user}', [AdminController::class, 'eliminarUsuario'])->name('admin.eliminar-usuario');
+    //Activar/desactivar un usuario
+    Route::patch('/usuarios/{user}/toggle-activo', [AdminController::class, 'toggleActivo'])->name('admin.toggle-activo');
 });
 
 //Rutas para la autenticación
