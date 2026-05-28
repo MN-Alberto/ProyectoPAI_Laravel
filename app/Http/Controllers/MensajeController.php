@@ -145,6 +145,14 @@ class MensajeController extends Controller
         $request->validate([
             'modelo' => 'required|string|in:' . implode(',', self::MODELOS),
         ]);
+
+        // Verifica que el usuario tenga permiso para usar ese modelo
+        if (!auth()->user()->puedeUsarModelo($request->modelo)) {
+            return response()->json([
+                'error' => 'No tienes permiso para usar este modelo',
+            ], 403);
+        }
+
         // Actualiza el modelo
         $conversacion->update(['modelo' => $request->modelo]);
         // Devuelve que todo ha ido bien y el modelo

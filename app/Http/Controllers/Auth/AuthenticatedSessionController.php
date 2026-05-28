@@ -28,6 +28,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        // Si el usuario está dado de baja, cerrar sesión y mostrar error
+        if (!$request->user()->estaActivo()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect()->route('login')->withErrors([
+                'email' => 'Tu cuenta ha sido desactivada. Contacta con el administrador.',
+            ]);
+        }
+
+        // Si el usuario es admin, redirigir al panel de administración
+        if ($request->user()->isAdmin()) {
+            return redirect()->route('admin.index');
+        }
+
         return redirect()->intended(route('conversaciones.index'));
     }
 
