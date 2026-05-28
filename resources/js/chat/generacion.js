@@ -312,6 +312,11 @@ window.enviar = async function () {
     if (!content || window.enviando) return;
     input.value = '';
     input.style.height = 'auto';
+    
+    // Reiniciar el contador de tokens visual
+    if (window.actualizarContadorTokens) {
+        window.actualizarContadorTokens('');
+    }
 
     window.establecerCargando(true);
     window.generacionDetenida = false;
@@ -341,6 +346,12 @@ window.enviar = async function () {
         if (!res.ok) {
             await manejarErrorRespuestaServidor(res, 'Error al enviar el mensaje');
             input.value = content; // Restaurar texto
+            
+            // Restaurar el contador de tokens visual
+            if (window.actualizarContadorTokens) {
+                window.actualizarContadorTokens(content);
+            }
+            
             finalizarGeneracion();
             return;
         }

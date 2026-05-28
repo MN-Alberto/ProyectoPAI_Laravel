@@ -173,7 +173,10 @@
                 </button>
             </div>
         </div>
-        <div class="pista-entrada">Enter para enviar · Shift+Enter para nueva línea</div>
+        <div class="pista-entrada">
+            <span>Enter para enviar · Shift+Enter para nueva línea</span>
+            <span id="contador-tokens" class="contador-tokens">Tokens: 0/10000</span>
+        </div>
     </div>
 
 @endsection
