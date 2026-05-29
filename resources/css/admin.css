@@ -1,0 +1,301 @@
+/* Importamos las variables del chat para admin*/
+@import './chat/variables.css';
+@import './admin/modal.css';
+@import './admin/tabla.css';
+@import './admin/header.css';
+@import './admin/statsCards.css';
+@import './admin/modalEliminar.css';
+@import './admin/paginacion.css';
+@import './admin/responsive.css';
+
+/* LAYOUT PRINCIPAL*/
+.admin-body {
+    font-family: var(--fuente-sans);
+    background: var(--fondo-oscuro);
+    color: var(--texto-principal);
+    min-height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* CONTENIDO PRINCIPAL */
+.admin-contenido {
+    flex: 1;
+    padding: 32px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* CELDAS ESPECIALES*/
+.celda-usuario {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar-tabla {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--acento), var(--acento-suave));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.info-usuario-tabla {
+    display: flex;
+    flex-direction: column;
+}
+
+.nombre-usuario-tabla {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.email-usuario-tabla {
+    font-size: 12px;
+    color: var(--texto-atenuado);
+}
+
+/*BADGES*/
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-activo {
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+}
+
+.badge-inactivo {
+    background: rgba(248, 113, 113, 0.12);
+    color: #f87171;
+}
+
+.badge-admin {
+    background: rgba(124, 106, 255, 0.12);
+    color: var(--acento-suave);
+}
+
+.badge-modelo {
+    background: var(--fondo-entrada);
+    border: 1px solid var(--borde);
+    color: var(--texto-principal);
+    margin: 2px;
+}
+
+/* CHECKBOXES CUSTOM*/
+.modelos-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.modelo-check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--borde);
+    background: var(--fondo-entrada);
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.modelo-check:hover {
+    border-color: var(--acento);
+}
+
+.modelo-check.checked {
+    background: rgba(124, 106, 255, 0.15);
+    border-color: var(--acento);
+    color: var(--acento-suave);
+}
+
+.modelo-check input[type="checkbox"] {
+    display: none;
+}
+
+.modelo-check-indicator {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 2px solid var(--borde);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.modelo-check.checked .modelo-check-indicator {
+    background: var(--acento);
+    border-color: var(--acento);
+}
+
+.modelo-check-indicator svg {
+    width: 10px;
+    height: 10px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.modelo-check.checked .modelo-check-indicator svg {
+    opacity: 1;
+}
+
+/* BOTONES ACCIONES */
+.acciones-celda {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-accion {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--borde);
+    background: var(--fondo-entrada);
+    color: var(--texto-atenuado);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.btn-accion:hover {
+    border-color: var(--acento);
+    color: var(--acento-suave);
+    transform: translateY(-1px);
+}
+
+.btn-accion.guardar:hover {
+    border-color: #4ade80;
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+}
+
+.btn-accion.eliminar:hover {
+    border-color: #f87171;
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.1);
+}
+
+.btn-accion.baja:hover {
+    border-color: #fbbf24;
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.btn-accion svg {
+    width: 14px;
+    height: 14px;
+}
+
+.btn-accion:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* TOAST NOTIFICACIÓN */
+.admin-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideInToast 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s;
+}
+
+.admin-toast.exito {
+    background: linear-gradient(135deg, #059669, #10b981);
+}
+
+.admin-toast.error {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.admin-toast.saliendo {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+}
+
+@keyframes slideInToast {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* EDICIÓN INLINE */
+.input-editar {
+    background: var(--fondo-entrada);
+    border: 1px solid var(--borde);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--texto-principal);
+    font-size: 13px;
+    outline: none;
+    width: 100%;
+    max-width: 200px;
+    transition: all 0.2s;
+}
+
+.input-editar:focus {
+    border-color: var(--acento);
+    box-shadow: 0 0 0 3px rgba(124, 106, 255, 0.15);
+}
+
+/* TEMA BOTON*/
+.admin-btn-tema {
+    background: none;
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    color: var(--texto-atenuado);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.admin-btn-tema:hover {
+    border-color: var(--acento);
+    color: var(--acento-suave);
+}

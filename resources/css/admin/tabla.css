@@ -1,0 +1,113 @@
+/* TABLA */
+.admin-tabla-contenedor {
+    background: var(--fondo-barra-lateral);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.admin-tabla-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--borde);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.admin-tabla-titulo {
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-tabla-titulo svg {
+    color: var(--acento);
+}
+
+.admin-buscar {
+    background: var(--fondo-entrada);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 8px 14px;
+    color: var(--texto-principal);
+    font-size: 13px;
+    outline: none;
+    width: 240px;
+    transition: all 0.2s;
+}
+
+.admin-buscar:focus {
+    border-color: var(--acento);
+    box-shadow: 0 0 0 3px rgba(124, 106, 255, 0.15);
+}
+
+.admin-buscar::placeholder {
+    color: var(--texto-tenue);
+}
+
+.admin-tabla-acciones-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-crear-usuario {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    border-radius: 10px !important;
+}
+
+.admin-tabla-scroll {
+    overflow-x: auto;
+}
+
+.admin-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-tabla th {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--texto-atenuado);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--borde);
+    background: var(--fondo-entrada);
+    white-space: nowrap;
+}
+
+.admin-tabla td {
+    padding: 14px 16px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(42, 42, 61, 0.4);
+    vertical-align: middle;
+}
+
+body.light .admin-tabla td {
+    border-bottom: 1px solid rgba(208, 208, 224, 0.5);
+}
+
+.admin-tabla tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-tabla tbody tr {
+    transition: background 0.15s;
+}
+
+.admin-tabla tbody tr:hover {
+    background: rgba(124, 106, 255, 0.04);
+}
+
+.admin-tabla tbody tr.fila-inactiva {
+    opacity: 0.5;
+}
