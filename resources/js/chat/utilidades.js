@@ -5,12 +5,36 @@ window.desplazarAbajo = function () {
     if (c) c.scrollTop = c.scrollHeight;
 }
 
-// Ajusta el tamaño del área de texto
+// Ajusta el tamaño del área de texto y actualiza el contador de tokens
 window.autoAjustar = function (el) {
     // Resetea la altura del área de texto
     el.style.height = 'auto';
     // Ajusta la altura del área de texto
     el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+
+    // Actualiza el contador de tokens
+    window.actualizarContadorTokens(el.value);
+}
+
+// Actualiza el contador visual de tokens
+window.actualizarContadorTokens = function (texto) {
+    const contador = document.getElementById('contador-tokens');
+    if (contador) {
+        const total = texto.length;
+        contador.textContent = `Tokens: ${total}/10000`;
+
+        // Estilos según la cercanía al límite
+        if (total >= 9500) {
+            contador.style.color = '#ff5252';
+            contador.style.fontWeight = '700';
+        } else if (total >= 8000) {
+            contador.style.color = '#ff9f43';
+            contador.style.fontWeight = '600';
+        } else {
+            contador.style.color = 'var(--texto-tenue)';
+            contador.style.fontWeight = 'normal';
+        }
+    }
 }
 
 // Maneja el envío de mensajes con la tecla enter
@@ -141,7 +165,7 @@ export function agregarMensaje(rol, contenido) {
 
     const typing = document.getElementById('escribiendo-ui');
     const div = document.createElement('div');
-    
+
     // Obtener la hora actual en formato local HH:mm
     const ahora = new Date();
     const horas = String(ahora.getHours()).padStart(2, '0');

@@ -83,6 +83,11 @@ php artisan migrate --force
 
 echo "Migraciones completadas"
 
+# Seeder (crea usuario admin si no existe)
+echo "Ejecutando seeder..."
+php artisan db:seed --force 2>/dev/null || true
+echo "Seeder completado"
+
 # Optimizar
 echo "[4/4] Optimizando..."
 # Optimizacion de Laravel

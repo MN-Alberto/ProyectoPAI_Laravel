@@ -50,24 +50,24 @@
             -->
             @forelse ($conversaciones as $conv)
                 <!--
-                                    Si la conversacion actual es la que se esta mostrando, se marca como active
-                                    -->
+                                        Si la conversacion actual es la que se esta mostrando, se marca como active
+                                        -->
                 <div class="item-conv {{ isset($conversacion) && $conversacion->id === $conv->id ? 'active' : '' }}">
                     <svg class="icono-conv-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
                     </svg>
                     <!--
-                                        Muestra el titulo de la conversacion y su fecha de ultima actividad
-                                        -->
+                                            Muestra el titulo de la conversacion y su fecha de ultima actividad
+                                            -->
                     <div class="info-conv">
                         <a href="{{ route('conversaciones.show', $conv) }}" class="titulo-conv">
                             {{ $conv->tituloConversacion }}
                         </a>
                         <!--
-                            Muestra la fecha de ultima actividad de la conversacion
-                            y se cambia la zona horaria a la de Madrid
-                            -->
+                                Muestra la fecha de ultima actividad de la conversacion
+                                y se cambia la zona horaria a la de Madrid
+                                -->
                         <span class="fecha-conv">
                             @if ($conv->mensajes_max_created_at)
                                 {{ \Carbon\Carbon::parse($conv->mensajes_max_created_at)->setTimezone('Europe/Madrid')->format('d/m/Y H:i') }}
@@ -75,14 +75,14 @@
                         </span>
                     </div>
                     <!--
-                                        Formulario para eliminar la conversacion
-                                        -->
+                                            Formulario para eliminar la conversacion
+                                            -->
                     <form action="{{ route('conversaciones.destroy', $conv) }}" method="POST" style="margin:0">
                         @csrf
                         @method('DELETE')
                         <!--
-                                            Boton para eliminar la conversacion
-                                            -->
+                                                Boton para eliminar la conversacion
+                                                -->
                         <button type="button" class="eliminar-conv btn-abrir-eliminar" title="Eliminar">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -93,8 +93,8 @@
                 </div>
             @empty
                 <!--
-                                    Si no hay conversaciones, se muestra un mensaje
-                                    -->
+                                        Si no hay conversaciones, se muestra un mensaje
+                                        -->
                 <div class="vacio-conv">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5"
                         stroke-linecap="round" stroke-linejoin="round">
@@ -188,8 +188,8 @@
 
                 @if ($errors->any())
                     <!--
-                                Si hay errores, se muestra un mensaje
-                                -->
+                                    Si hay errores, se muestra un mensaje
+                                    -->
                     <div class="alerta-error">
                         <ul>
                             @foreach ($errors->all() as $error)

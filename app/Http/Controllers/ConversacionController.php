@@ -10,6 +10,11 @@ class ConversacionController extends Controller
 {
     public function index()
     {
+        // Admin no tiene vista de chat, redirigir al panel de admin
+        if (auth()->user()->isAdmin()) {
+            return redirect()->route('admin.index');
+        }
+
         $conversaciones = auth()->user()->conversaciones()->withMax('mensajes', 'created_at')->latest()->get(); // Obtiene las conversaciones del usuario ordenadas por fecha
 
         // Si el usuario no tiene conversaciones, crea una nueva llamada "Nuevo chat" y redirige a ella
@@ -64,6 +69,20 @@ class ConversacionController extends Controller
             'deepseek-coder' => 'DeepSeek Coder',
             'tinyllama' => 'TinyLlama'
         ];
+
+        // Filtrar modelos según permisos del usuario
+        $usuario = auth()->user();
+        if ($usuario->modelos_permitidos !== null) {
+            $modelosDisponibles = array_filter($modelosDisponibles, function ($clave) use ($usuario) {
+                return $usuario->puedeUsarModelo($clave);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
+        // Si el modelo actual de la conversación no está permitido, cambiar al primero permitido
+        if (!empty($modelosDisponibles) && !array_key_exists($conversacion->modelo, $modelosDisponibles)) {
+            $primerModelo = array_key_first($modelosDisponibles);
+            $conversacion->update(['modelo' => $primerModelo]);
+        }
 
         // Muestra la conversación
         return view('conversaciones.show', compact('conversacion', 'conversaciones', 'mensajes', 'modelosDisponibles'));

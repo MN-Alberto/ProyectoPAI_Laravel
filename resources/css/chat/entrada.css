@@ -139,12 +139,21 @@
 }
 
 .pista-entrada {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 11px;
     color: var(--texto-tenue);
     margin: 8px auto 0;
     font-family: var(--fuente-mono);
     max-width: 950px;
+}
+
+.contador-tokens {
+    font-size: 11px;
+    color: var(--texto-tenue);
+    font-family: var(--fuente-mono);
+    transition: color 0.3s ease, font-weight 0.3s ease;
 }
 
 .logo-img {

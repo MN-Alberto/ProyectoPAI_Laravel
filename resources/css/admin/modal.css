@@ -1,0 +1,173 @@
+/* MODAL*/
+.modal-admin {
+    max-width: 480px;
+}
+
+.modal-header-admin {
+    padding: 24px 28px !important;
+    background: linear-gradient(135deg, rgba(124, 106, 255, 0.06), rgba(124, 106, 255, 0.02));
+}
+
+body.light .modal-header-admin {
+    background: linear-gradient(135deg, rgba(124, 106, 255, 0.08), rgba(124, 106, 255, 0.02));
+}
+
+.modal-header-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.modal-icono-header {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.modal-icono-header.editar {
+    background: linear-gradient(135deg, rgba(124, 106, 255, 0.2), rgba(124, 106, 255, 0.1));
+    color: var(--acento);
+}
+
+.modal-icono-header.crear {
+    background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(74, 222, 128, 0.1));
+    color: #4ade80;
+}
+
+.modal-header-info h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--texto-principal);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.modal-subtitulo {
+    font-size: 12px;
+    color: var(--texto-atenuado);
+    margin: 2px 0 0;
+    font-weight: 400;
+}
+
+.modal-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+}
+
+.modal-campo label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--texto-principal);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.modal-campo label svg {
+    color: var(--texto-atenuado);
+}
+
+.modal-campo-hint {
+    font-size: 11px;
+    color: var(--texto-tenue);
+    font-weight: 400;
+    margin-top: -2px;
+}
+
+.modal-input-admin {
+    background: var(--fondo-entrada);
+    border: 1px solid var(--borde);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--texto-principal);
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+}
+
+.modal-input-admin::placeholder {
+    color: var(--texto-tenue);
+}
+
+.modal-input-admin:focus {
+    border-color: var(--acento);
+    box-shadow: 0 0 0 3px rgba(124, 106, 255, 0.12), 0 2px 8px rgba(124, 106, 255, 0.08);
+    background: var(--fondo-oscuro);
+}
+
+body.light .modal-input-admin:focus {
+    background: #fff;
+}
+
+.modal-separador {
+    height: 1px;
+    background: var(--borde);
+    margin: 4px 0 12px;
+    opacity: 0.6;
+}
+
+.modal-acciones-admin {
+    margin-top: 24px !important;
+    padding-top: 20px;
+    border-top: 1px solid var(--borde);
+}
+
+.modal-btn-cancelar-admin {
+    background: none;
+    border: 1px solid var(--borde);
+    color: var(--texto-atenuado);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-btn-cancelar-admin:hover {
+    border-color: var(--texto-atenuado);
+    color: var(--texto-principal);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.modal-btn-guardar-admin {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, var(--acento), var(--acento-suave));
+    border: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(124, 106, 255, 0.3);
+}
+
+.modal-btn-guardar-admin:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(124, 106, 255, 0.45);
+}
+
+.modal-btn-guardar-admin:active {
+    transform: translateY(0);
+}
+
+.modal-btn-guardar-admin.crear {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.modal-btn-guardar-admin.crear:hover {
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+}

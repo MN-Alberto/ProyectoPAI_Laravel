@@ -22,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin',
+        'modelos_permitidos',
+        'activo',
     ];
 
     /**
@@ -44,7 +47,39 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'modelos_permitidos' => 'array',
+            'is_admin' => 'boolean',
+            'activo' => 'boolean',
         ];
+    }
+
+    /**
+     * Verifica si el usuario es administrador
+     * Comprueba el campo is_admin O el email hardcodeado
+     */
+    public function isAdmin(): bool
+    {
+        return $this->is_admin || $this->email === 'admin@gmail.com';
+    }
+
+    /**
+     * Verifica si el usuario puede usar un modelo específico
+     * Si modelos_permitidos es null, tiene acceso a todos
+     */
+    public function puedeUsarModelo(string $modelo): bool
+    {
+        if ($this->modelos_permitidos === null) {
+            return true;
+        }
+        return in_array($modelo, $this->modelos_permitidos);
+    }
+
+    /**
+     * Verifica si el usuario está activo
+     */
+    public function estaActivo(): bool
+    {
+        return $this->activo;
     }
 
     /**
