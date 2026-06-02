@@ -2,11 +2,12 @@
 
 ## Descripción del proyecto
 
-**PAI** es una aplicación web tipo ChatGPT desarrollada como sistema de chat inteligente multiusuario. Permite a los usuarios autenticados mantener conversaciones persistentes con una inteligencia artificial local, generando respuestas en tiempo real mediante streaming.
+**PAI** es una aplicación web tipo ChatGPT desarrollada como sistema de chat inteligente multiusuario. Permite a los usuarios autenticados mantener conversaciones persistentes con una inteligencia artificial, generando respuestas en tiempo real mediante streaming.
 
-El sistema funciona completamente en local y offline, ejecutando tanto el backend como el modelo de inteligencia artificial directamente en el ordenador del usuario mediante Docker.
+El sistema puede funcionar completamente offline si se ejecuta localmente, ejecutando tanto el backend como el modelo de inteligencia artificial directamente en el ordenador del usuario mediante Docker.
+También se puede ejecutar de forma online desplegándolo en un servidor web. En ese caso, el modelo de IA se ejecutará en el servidor con Ollama.
 
-El objetivo del proyecto es simular un sistema SaaS moderno de chat con IA, incluyendo gestión de usuarios, historial de conversaciones, streaming de respuestas y ejecución de un modelo de lenguaje local sin dependencias externas ni servicios cloud.
+El objetivo del proyecto es simular un sistema SaaS moderno de chat con IA, incluyendo gestión de usuarios, historial de conversaciones, streaming de respuestas y ejecución de un modelo de lenguaje sin dependencias externas ni servicios cloud.
 
 ---
 
@@ -17,22 +18,25 @@ El objetivo del proyecto es simular un sistema SaaS moderno de chat con IA, incl
 - Gestionar conversaciones persistentes
 - Integrar uno o varios modelos de IA en local
 - Implementar respuestas en streaming (tiempo real)
-- Ejecutar todo el sistema completamente offline
-- Ejecutar todo el sistema en entorno portable mediante Docker
+- Posibilidad de ejecutar todo el sistema completamente offline
+- Posibilidad de ejecutar todo el sistema en entorno portable mediante Docker
+- Subir el proyecto a un servidor web y que funcione igual de bien, con el modelo de IA en el servidor con Ollama, no en local.
 
 ---
 
 ## Arquitectura del sistema
 
-Frontend (Blade / JavaScript)
+Frontend (Blade / JavaScript) - UI tipo chat en tiempo real
         ->
-Backend (Laravel API)
+Nginx (proxy inverso) - HTTPS - Let's Encrypt - DuckDNS
         ->
-Servicios internos (Chat + IA)
+Backend (Laravel API) - Rutas - controladores - auth - prompt
         ->
-Modelos de IA local (Ollama)
+Servicios internos (Chat + IA) - construcción del prompt - historial
         ->
-Base de datos (MySQL)
+Modelos de IA local (Ollama) - Mistral - Phi-3 - DeepSeek - TinyLlama
+        ->
+Base de datos (MySQL) - Usuarios - conversaciones - mensajes
 
 ---
 
@@ -67,11 +71,13 @@ Base de datos (MySQL)
 
 ---
 
-## Funcionamiento offline
+## Funcionamiento
 
-El sistema está diseñado para funcionar completamente sin conexión a internet.
+La aplicación ahora se encuentra desplegado en un servidor web.
 
-Todas las operaciones se ejecutan localmente:
+Cuando la aplicación se ejecutaba en local, estaba diseñada para funcionar completamente sin conexión a internet. En ese caso:
+
+Todas las operaciones se ejecutaban localmente:
 
 - Backend Laravel local
 - Base de datos MySQL local
@@ -99,11 +105,9 @@ Esto permite:
 - Streaming de tokens en tiempo real
 - Baja latencia en entorno local
 
-Laravel se comunica directamente con Ollama mediante HTTP interno:
+El navegador envia el mensaje a Laravel, este construye el prompt y lo envia de nuevo al navegador, el navegador se comunica con ollama para enviar el mensaje y recibir la respuesta de ollama.
 
-```php
-Http::post('http://ollama:11434/api/generate')
-```
+Ahora se encuentra desplegado en un servidor web, por lo que el navegador se comunica con Laravel a traves de Nginx y este con Ollama.
 
 ---
 
@@ -119,6 +123,7 @@ Http::post('http://ollama:11434/api/generate')
 - Cancelación de generación de respuesta
 - Gestión de múltiples conversaciones por usuario
 - Ejecución completamente offline
+- Vista de administrador para la gestión de usuarios
 
 ---
 
@@ -134,21 +139,26 @@ docker compose up --build
 
 ### 2. Acceder a la aplicación
 
-La aplicación se ejecuta localmente en:
+La aplicación se ejecutaba localmente en:
 
 ```txt
 http://localhost:8000
 ```
 
+Ahora se encuentra desplegado en un servidor web:
+
+https://proyectopai.duckdns.org
+
 ---
 
 ## Servicios incluidos
 
-| Servicio    | Descripción                              |
-| ------------ | ---------------------------------------- |
-| Laravel App | Backend principal del sistema            |
-| MySQL       | Base de datos local                      |
-| Ollama      | Motor de IA local offline                |
+| Servicio    | Descripción                   |
+| ----------- | ----------------------------- |
+| Nginx       | Proxy inverso - HTTPS         |
+| Laravel App | Backend principal del sistema |
+| MySQL       | Base de datos local           |
+| Ollama      | Motor de IA local offline     |
 
 ---
 
@@ -174,10 +184,11 @@ Esto permite:
 
 1. El usuario envía un mensaje seleccionando el modelo a utilizar
 2. Laravel guarda el mensaje en MySQL y construye el contexto de conversación con el modelo seleccionado
-3. Laravel envía el prompt a Ollama con el modelo seleccionado
-4. Ollama genera la respuesta token a token con el modelo seleccionado
-5. El frontend recibe el stream en tiempo real
-6. La respuesta se almacena en la base de datos
+3. Laravel envía el prompt al navegador
+4. El navegador se comunica con Ollama para enviar el prompt y recibir la respuesta en streaming
+5. Ollama genera la respuesta token a token con el modelo seleccionado
+6. El frontend muestra la respuesta en tiempo real
+7. Laravel almacena la respuesta final en la base de datos
 
 ---
 
@@ -188,7 +199,6 @@ Esto permite:
 - Aislamiento de conversaciones por usuario
 - Policies para control de acceso
 - Sin envío de datos a servidores externos
-- Ejecución completamente local
 
 ---
 
@@ -199,7 +209,7 @@ Esto permite:
 - Windows 10/11
 - Docker Desktop
 - 16GB RAM recomendados
-- Espacio libre suficiente para modelos LLM (~20GB)
+- Espacio libre suficiente para modelos LLM (~30GB)
 
 ### Requisitos opcionales
 
@@ -236,10 +246,8 @@ Esto permite continuar el desarrollo o realizar presentaciones sin necesidad de 
 ## Posibles mejoras futuras
 
 - Memoria a largo plazo
-- Sistema de roles (admin/user)
 - Interfaz avanzada React/Vue
 - Integración RAG local
-- Base vectorial local
 - GPU acceleration
 
 ---
